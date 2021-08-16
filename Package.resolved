@@ -2,12 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "SDL2",
-        "repositoryURL": "https://github.com/ctreffs/SwiftSDL2.git",
+        "package": "cglm",
+        "repositoryURL": "https://github.com/recp/cglm",
         "state": {
-          "branch": null,
-          "revision": "886e6552f18240c2403fea2e66435e3bf82d3ef5",
-          "version": "1.2.0"
+          "branch": "master",
+          "revision": "672523e5afb284c8e2ff568f78c9a365e5823d38",
+          "version": null
         }
       }
     ]

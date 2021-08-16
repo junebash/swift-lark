@@ -12,19 +12,20 @@ let package = Package(
     .library(name: "Lark", targets: ["Lark"])
   ],
   dependencies: [
-    .package(
-      url: "https://github.com/ctreffs/SwiftSDL2.git",
-      from: "1.2.0"
-    )
+    .package(url: "https://github.com/recp/cglm", .branch("master"))
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
     // Targets can depend on other targets in this package, and on products in packages this package depends on.
-
+    .systemLibrary(name: "SDL2", pkgConfig: "sdl2", providers: [
+      .brew(["sdl2"]),
+      .apt(["libsdl2-dev"])
+    ]),
     .target(
       name: "Lark",
       dependencies: [
-        .product(name: "SDL2", package: "SwiftSDL2")
+        "SDL2",
+        "cglm"
       ]
     ),
     .executableTarget(
