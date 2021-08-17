@@ -61,14 +61,17 @@ public struct Event {
     self.sdlEvent = sdlEvent
   }
 
-  public static func poll() -> Event {
-    var event = SDL_Event()
-    SDL_PollEvent(&event)
-    return Event(sdlEvent: event)
+  public static func polled() -> UnfoldSequence<Event, Event> {
+    sequence(state: Event()) { event in
+      if SDL_PollEvent(&event.sdlEvent) == 0 {
+        return nil
+      } else {
+        return event
+      }
+    }
   }
-}
 
-
-public struct Events {
-  private var sdlEvents: [SDL_Event] = []
+  public mutating func poll() {
+    SDL_PollEvent(&sdlEvent)
+  }
 }

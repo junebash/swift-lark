@@ -75,9 +75,9 @@ struct SimpleGame: Game {
   mutating func processEvents(_ event: Event) {
     if event.key == .escape || event.type == .quit {
       isRunning = false
+      return
     }
-    ball.processEvents(event)
-    paddle.processEvents(event)
+    paddle.processEvent(event)
   }
 
   mutating func update(deltaTime: Double) {

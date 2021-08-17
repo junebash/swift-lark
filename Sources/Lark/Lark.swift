@@ -1,25 +1,38 @@
 import SDL2
+import OSLog
 
 public final class Lark {
   public var framesPerSecond: UInt32
   public var targetMSPerFrame: UInt32 { 1000 / framesPerSecond }
   public private(set) var lastFrameTime: UInt32 = 0
+  public let logger: Logger
 
-  public init(framesPerSecond: UInt32 = 60) throws {
-    try Result(code: SDL_Init(SDL_INIT_EVERYTHING)).get()
+  public init(framesPerSecond: UInt32 = 60, logger: Logger = Logger()) throws {
+    do {
+      try Result(code: SDL_Init(SDL_INIT_EVERYTHING)).get()
+    } catch {
+      logger.critical("Error initializing Lark engine: \(error.localizedDescription)")
+      throw error
+    }
     self.framesPerSecond = framesPerSecond
+    self.logger = logger
   }
 
   deinit {
     SDL_Quit()
   }
 
-  public func run<G: Game>(_ game: G, renderer: Renderer) {
+  public func run<G: Game>(_ game: G, renderer: Renderer?) {
     var game = game
     lastFrameTime = SDL_GetTicks()
+    let render: (G) -> Void = renderer.map({ renderer in { renderer.draw($0) } })
+      ?? { _ in }
 
     while game.isRunning {
-      game.processEvents(Event.poll())
+      let events = Event.polled()
+      for event in events {
+        game.processEvent(event)
+      }
 
       // TODO: use async/await
       let (timeToWait, overflow) = targetMSPerFrame
@@ -33,7 +46,7 @@ public final class Lark {
       lastFrameTime = ticks
 
       game.update(deltaTime: deltaTime)
-      game.draw(renderer: renderer)
+      render(game)
     }
   }
 }

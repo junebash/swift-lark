@@ -1,5 +1,9 @@
 import SDL2
 
+public protocol Drawable {
+  func draw(renderer: Renderer)
+}
+
 public final class Renderer {
   public let window: Window
   var pointer: OpaquePointer
@@ -55,9 +59,9 @@ public final class Renderer {
   }
 
   @discardableResult
-  public func draw(_ gameObjects: GameObject...) -> Renderer {
-    for object in gameObjects {
-      object.draw(renderer: self)
+  public func draw(_ renderables: Drawable...) -> Renderer {
+    for renderable in renderables {
+      renderable.draw(renderer: self)
     }
     return self
   }

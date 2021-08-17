@@ -1,8 +1,8 @@
 import Lark
 
-let window = Window(
+let window = try Window(
   title: "It's a Window!",
-  position: .centeredWindowPosition,
+  position: .centered,
   size: .init(x: 800, y: 600),
   options: []
 )

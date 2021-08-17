@@ -1,3 +1,5 @@
+import SDL2
+
 public struct LarkError: Error {
   let code: Int32?
   let message: String?
@@ -23,7 +25,7 @@ public extension Result where Success == Void, Failure == LarkError {
     if code == 0 {
       self = .success
     } else {
-      self = .failure(LarkError(code: code))
+      self = .failure(LarkError(code: code, message: String(cString: SDL_GetError())))
     }
   }
 }
