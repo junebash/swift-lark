@@ -1,7 +1,7 @@
 import SDL2
 
-public struct EngineOptions: OptionSet {
-    public var rawValue: UInt32
+public struct EngineInitOptions: OptionSet {
+    public private(set) var rawValue: UInt32
 
     public init(rawValue: UInt32) {
         self.rawValue = rawValue
@@ -15,5 +15,5 @@ public struct EngineOptions: OptionSet {
     public static let gameController: Self = .init(rawValue: SDL_INIT_GAMECONTROLLER)
     public static let events: Self = .init(rawValue: SDL_INIT_EVENTS)
     public static let sensor: Self = .init(rawValue: SDL_INIT_SENSOR)
-    public static let everything: Self = [.timer, .audio, .haptic, .gameController, .events, .sensor]
+    public static let everything: Self = [.timer, .audio, .haptic, .gameController, .events, .sensor, .video]
 }

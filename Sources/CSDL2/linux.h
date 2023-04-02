@@ -61,3 +61,6 @@
 #include <SDL_version.h>
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
+
+// -- image --
+#include <SDL2/SDL2_image.h>

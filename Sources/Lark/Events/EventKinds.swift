@@ -1,67 +1,156 @@
 import SDL2
 
-public enum Orientation {
+public enum Orientation: Sendable, Hashable {
     case unknown, landscape, landscapeFlipped, portrait, portraitFlipped
+
+    @inlinable
+    internal init(sdlOrientation: SDL_DisplayOrientation) {
+        switch sdlOrientation {
+        case SDL_ORIENTATION_PORTRAIT:
+            self = .portrait
+        case SDL_ORIENTATION_PORTRAIT_FLIPPED:
+            self = .portraitFlipped
+        case SDL_ORIENTATION_LANDSCAPE:
+            self = .landscape
+        case SDL_ORIENTATION_LANDSCAPE_FLIPPED:
+            self = .landscapeFlipped
+        default:
+            self = .unknown
+        }
+    }
 }
 
-public enum DisplayEvent {
+public enum DisplayEvent: Sendable, Hashable {
     case none
     case orientationChanged(Orientation)
     case connected
     case disconnected
+
+    @inlinable
+    internal init(sdlDisplayEvent: SDL_DisplayEvent) {
+        switch SDL_DisplayEventID(UInt32(sdlDisplayEvent.event)) {
+        case SDL_DISPLAYEVENT_CONNECTED:
+            self = .connected
+        case SDL_DISPLAYEVENT_DISCONNECTED:
+            self = .disconnected
+        case SDL_DISPLAYEVENT_ORIENTATION:
+            self = .orientationChanged(
+                Orientation(sdlOrientation: .init(UInt32(bitPattern: sdlDisplayEvent.data1)))
+            )
+        default:
+            self = .none
+        }
+    }
 }
 
-public enum WindowEvent {
+public enum WindowEvent: Sendable, Hashable {
     case none, shown, hidden, exposed
-    case moved(IPoint)
-    case resized(ISize)
-    case sizeChanged(ISize)
+    case moved(IPoint2)
+    case resized(ISize2)
+    case sizeChanged(ISize2)
     case minimized, maximized, restored, enter, leave, focusGained, focusLost, takeFocus, close
     case hitTest, iccProfChanged
     case displayChanged(Int32)
+
+    @inlinable
+    internal init(sdlWindowEvent: SDL_WindowEvent) {
+        switch SDL_WindowEventID(UInt32(sdlWindowEvent.event)) {
+        case SDL_WINDOWEVENT_SHOWN:
+            self = .shown
+        case SDL_WINDOWEVENT_HIDDEN:
+            self = .hidden
+        case SDL_WINDOWEVENT_EXPOSED:
+            self = .exposed
+        case SDL_WINDOWEVENT_MOVED:
+            self = .moved(IPoint2(x: sdlWindowEvent.data1, y: sdlWindowEvent.data2))
+        case SDL_WINDOWEVENT_RESIZED:
+            self = .resized(.init(width: sdlWindowEvent.data1, height: sdlWindowEvent.data2))
+        case SDL_WINDOWEVENT_MINIMIZED:
+            self = .minimized
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            self = .maximized
+        case SDL_WINDOWEVENT_RESTORED:
+            self = .restored
+        case SDL_WINDOWEVENT_ENTER:
+            self = .enter
+        case SDL_WINDOWEVENT_LEAVE:
+            self = .leave
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            self = .focusGained
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            self = .focusLost
+        case SDL_WINDOWEVENT_TAKE_FOCUS:
+            self = .takeFocus
+        case SDL_WINDOWEVENT_CLOSE:
+            self = .close
+        case SDL_WINDOWEVENT_HIT_TEST:
+            self = .hitTest
+        case SDL_WINDOWEVENT_ICCPROF_CHANGED:
+            self = .iccProfChanged
+        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
+            self = .displayChanged(sdlWindowEvent.data1)
+        default:
+            self = .none
+        }
+    }
 }
 
-public struct KeyEventInfo {
+public struct KeyEventInfo: Sendable, Hashable {
     public let windowID: UInt32
     public let keyCode: KeyCode?
     public let scanCode: ScanCode?
     public let keyMod: KeyMod
     public let isRepeat: Bool
+
+    @inlinable
+    public init(
+        windowID: UInt32,
+        keyCode: KeyCode?,
+        scanCode: ScanCode?,
+        keyMod: KeyMod,
+        isRepeat: Bool
+    ) {
+        self.windowID = windowID
+        self.keyCode = keyCode
+        self.scanCode = scanCode
+        self.keyMod = keyMod
+        self.isRepeat = isRepeat
+    }
 }
 
-public enum MouseState {
+public enum MouseState: Sendable, Hashable {
     case pressed, released
 }
 
-public enum MouseButton {
-
+public enum MouseButton: Sendable, Hashable {
+    // TODO: add MouseButton cases
 }
 
 
-public struct MouseEventInfo {
-    public struct ButtonInfo {
+public struct MouseEventInfo: Sendable, Hashable {
+    public struct ButtonInfo: Sendable, Hashable {
         let mouseButton: MouseButton
         let clicks: UInt8
     }
 
-    public enum WheelDirection {
+    public enum WheelDirection: Sendable, Hashable {
         case normal, flipped
     }
 
-    public enum Kind {
-        case motion(state: MouseState, motion: IVector)
+    public enum Kind: Sendable, Hashable {
+        case motion(state: MouseState, motion: IVector2)
         case buttonDown(ButtonInfo)
         case buttonUp(ButtonInfo)
-        case wheel(direction: WheelDirection, precisePosition: FPoint)
+        case wheel(direction: WheelDirection, precisePosition: FPoint2)
     }
 
     public let windowID: UInt32
     public let mouseID: UInt32
-    public let position: IPoint
+    public let position: IPoint2
     public let kind: Kind
 }
 
-public struct JoystickHatState {
+public struct JoystickHatState: Sendable, Hashable {
     internal let rawValue: UInt8
 
     public static let centered: Self = .init(rawValue: 0)
@@ -75,10 +164,10 @@ public struct JoystickHatState {
     public static let downLeft: Self = .init(rawValue: 0x08 | 0x04)
 }
 
-public struct JoystickEventInfo {
-    public enum Kind {
+public struct JoystickEventInfo: Sendable, Hashable {
+    public enum Kind: Sendable, Hashable {
         case axisMotion(axisIndex: UInt8, value: Int16)
-        case ballMotion(ballIndex: UInt8, relativeMotion: Vector<Int16>)
+        case ballMotion(ballIndex: UInt8, relativeMotion: Vector2<Int16>)
         case hatMotion(hatIndex: UInt8, state: JoystickHatState)
         case joyButtonDown(buttonIndex: UInt8)
         case joyButtonUp(buttonIndex: UInt8)
@@ -90,7 +179,7 @@ public struct JoystickEventInfo {
     public let kind: Kind
 }
 
-public enum ControllerButton {
+public enum ControllerButton: Sendable, Hashable {
     case a, b, x, y
     case back, guide, start
     case leftStick, rightStick, leftShoulder, rightShoulder
@@ -126,7 +215,7 @@ public enum ControllerButton {
     }
 }
 
-public enum ControllerAxis {
+public enum ControllerAxis: Sendable, Hashable {
     case leftX
     case leftY
     case rightX
@@ -147,17 +236,17 @@ public enum ControllerAxis {
     }
 }
 
-public struct ControllerEventInfo {
-    public struct TouchpadEventInfo {
+public struct ControllerEventInfo: Sendable, Hashable {
+    public struct TouchpadEventInfo: Sendable, Hashable {
         public let index: UInt32
         public let fingerIndex: UInt32
         /// Normalized 0...1, 0 at top-left
-        public let position: FVector
+        public let position: FVector2
         /// Normalized 0...1
         public let pressure: Double
     }
 
-    public enum Kind {
+    public enum Kind: Sendable, Hashable {
         case axisMotion(axis: ControllerAxis, value: Int16)
         case buttonDown(ControllerButton)
         case buttonUp(ControllerButton)
@@ -168,27 +257,14 @@ public struct ControllerEventInfo {
         case touchpadMotion(TouchpadEventInfo)
         case touchpadUp(TouchpadEventInfo)
         case sensorUpdated // TODO
-        /*
-         /// Triggered when the gyroscope or accelerometer is updated
-         #[cfg(feature = "hidapi")]
-         ControllerSensorUpdated {
-             timestamp: u32,
-             which: u32,
-             sensor: crate::sensor::SensorType,
-             /// Data from the sensor.
-             ///
-             /// See the `sensor` module for more information.
-             data: [f32; 3],
-         },
-         */
     }
 
     public let id: UInt32
     public let kind: Kind
 }
 
-public struct FingerEventInfo {
-    public enum Kind {
+public struct FingerEventInfo: Sendable, Hashable {
+    public enum Kind: Sendable, Hashable {
         case fingerUp
         case fingerDown
         case motion
@@ -196,19 +272,19 @@ public struct FingerEventInfo {
 
     public let touchID: Int
     public let fingerID: Int
-    public let position: FPoint
-    public let delta: FVector
+    public let position: FPoint2
+    public let delta: FVector2
     public let pressure: Double
     public let kind: Kind
 }
 
-public struct DollarEventInfo {
+public struct DollarEventInfo: Sendable, Hashable {
     public let gestureID: Int
     public let error: Float
 }
 
-public struct TouchEventInfo {
-    public enum Kind {
+public struct TouchEventInfo: Sendable, Hashable {
+    public enum Kind: Sendable, Hashable {
         case dollarGesture(DollarEventInfo)
         case dollarRecord(DollarEventInfo)
         case multiGesture(dTheta: Double, dDist: Double)
@@ -217,11 +293,11 @@ public struct TouchEventInfo {
     public let kind: Kind
     public let touchID: Int
     public let fingerCount: UInt32
-    public let position: FPoint
+    public let position: FPoint2
 }
 
-public struct DropEventInfo {
-    public enum Kind {
+public struct DropEventInfo: Sendable, Hashable {
+    public enum Kind: Sendable, Hashable {
         case dropFile(fileName: String)
         case dropText(fileName: String)
         case dropBegin
@@ -232,8 +308,8 @@ public struct DropEventInfo {
     public let kind: Kind
 }
 
-public struct AudioDeviceEventInfo {
-    public enum Kind {
+public struct AudioDeviceEventInfo: Sendable, Hashable {
+    public enum Kind: Sendable, Hashable {
         case added, removed
     }
 
@@ -242,8 +318,8 @@ public struct AudioDeviceEventInfo {
     public let kind: Kind
 }
 
-public struct UserEventInfo {
-    public struct Registration: Hashable {
+public struct UserEventInfo: Sendable, Hashable {
+    public struct Registration: Sendable, Hashable {
         internal let rawValue: UInt32
 
         internal init(rawValue: UInt32) {
@@ -269,63 +345,5 @@ public struct UserEventInfo {
         self.windowID = windowID
         self.data1 = data1
         self.data2 = data2
-    }
-}
-
-public struct Event {
-    public enum Kind {
-        case quit
-        case appTerminating
-        case appLowMemory
-        case appWillEnterBackground
-        case appDidEnterBackground
-        case appWillEnterForeground
-        case appDidEnterForeground
-        case display(index: Int32, event: DisplayEvent)
-        case window(id: UInt32, event: WindowEvent)
-        case keyDown(KeyEventInfo)
-        case keyUp(KeyEventInfo)
-        case textEditing(windowID: UInt32, text: String, start: Int, length: Int)
-        case textInput(windowID: UInt32, text: String)
-        case mouse(MouseEventInfo)
-        case joystick(JoystickEventInfo)
-        case controller(ControllerEventInfo)
-        case finger(FingerEventInfo)
-        case clipboardUpdate
-        case touch(TouchEventInfo)
-        case drop(DropEventInfo)
-        case audioDevice(AudioDeviceEventInfo)
-        case renderTargetsReset
-        case renderDeviceReset
-        case user(UserEventInfo)
-    }
-
-    public var kind: Kind
-    public var timestamp: Duration
-}
-
-extension Event {
-    internal struct Poll: Sequence, IteratorProtocol {
-        private var event: SDL_Event = .init()
-
-        init() {}
-
-        mutating func next() -> Event? {
-            guard SDL_PollEvent(&event) == 1 else { return nil }
-            // TODO
-            return nil
-        }
-    }
-}
-
-public struct Events: Sendable {
-    private var _makeEvents: @Sendable () -> [Event]
-
-    public init(_ makeEvents: @escaping @Sendable () -> some Sequence<Event>) {
-        self._makeEvents = { Array(makeEvents()) }
-    }
-
-    public func callAsFunction() -> [Event] {
-        _makeEvents()
     }
 }

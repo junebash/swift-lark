@@ -5,22 +5,19 @@ public struct SDLError: Error {
     public var description: String
 
     @inlinable
-    init?(code: Int32) {
-        guard code != 0 else { return nil }
+    init(code: Int32? = nil, description: String = "") {
         self.code = code
-        if let messagePointer = SDL_GetError() {
-            self.description = .init(cString: messagePointer)
-            SDL_ClearError()
-        } else {
-            self.description = "Unknown error occurred"
-        }
+        self.description = description
     }
 
     @inlinable
-    init?() {
-        if let messagePointer = SDL_GetError() {
-            self.description = .init(cString: messagePointer)
-            SDL_ClearError()
+    static func get(code: Int32? = nil) -> SDLError? {
+        if let code {
+            guard code > 0 else { return nil }
+        }
+        if let messagePointer = SDL_GetError(), messagePointer.pointee != 0 {
+            defer { SDL_ClearError() }
+            return .init(code: code, description: .init(cString: messagePointer))
         } else {
             return nil
         }
@@ -30,7 +27,7 @@ public struct SDLError: Error {
 @inlinable
 func withThrowingSDL(_ operation: () -> Int32) throws {
     let opCode = operation()
-    if let error = SDLError(code: opCode) {
+    if let error = SDLError.get(code: opCode) {
         throw LarkError.sdl(error)
     }
 }
@@ -38,7 +35,7 @@ func withThrowingSDL(_ operation: () -> Int32) throws {
 @inlinable
 func withThrowingSDL<Output>(_ operation: () -> Output?) throws -> Output {
     guard let result = operation() else {
-        throw SDLError().map(LarkError.sdl) ?? .unknown
+        throw SDLError.get().map(LarkError.sdl) ?? .unknown
     }
     return result
 }

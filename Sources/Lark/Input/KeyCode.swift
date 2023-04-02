@@ -1,6 +1,6 @@
 import SDL2
 
-public struct KeyCode: RawRepresentable, Hashable {
+public struct KeyCode: RawRepresentable, Hashable, Sendable {
     public var rawValue: UInt32
 
     public init(rawValue: UInt32) {

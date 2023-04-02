@@ -1,31 +1,37 @@
 import SDL2
 
+@MainActor
 public final class Window {
     internal let _sdlWindowPtr: OpaquePointer
 
     public init(
         title: String,
-        x: some BinaryInteger,
-        y: some BinaryInteger,
-        w: some BinaryInteger,
-        h: some BinaryInteger,
+        x: Int32,
+        y: Int32,
+        w: Int32,
+        h: Int32,
         options: Options = []
     ) throws {
         self._sdlWindowPtr = try withThrowingSDL {
             title.withCString { ptr in
                 SDL_CreateWindow(
                     ptr,
-                    Int32(x),
-                    Int32(y),
-                    Int32(w),
-                    Int32(h),
+                    x,
+                    y,
+                    w,
+                    h,
                     options.rawValue
                 )
             }
         }
     }
 
-    public init(title: String, position: Position, size: Size<some BinaryInteger>, options: Options = []) throws {
+    public init(
+        title: String,
+        position: Position,
+        size: Size2<Int32>,
+        options: Options = []
+    ) throws {
         let mask = position.windowMask
         self._sdlWindowPtr = try withThrowingSDL {
             title.withCString { ptr in
@@ -43,6 +49,12 @@ public final class Window {
 
     deinit {
         SDL_DestroyWindow(_sdlWindowPtr)
+    }
+
+    public func setFullScreen(options: Window.Options = [.fullscreen]) throws {
+        try withThrowingSDL {
+            SDL_SetWindowFullscreen(_sdlWindowPtr, options.rawValue)
+        }
     }
 }
 

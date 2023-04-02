@@ -1,4 +1,4 @@
-public struct KeyMod: OptionSet {
+public struct KeyMod: OptionSet, Sendable, Hashable {
     public var rawValue: UInt32
 
     public init(rawValue: UInt32) {

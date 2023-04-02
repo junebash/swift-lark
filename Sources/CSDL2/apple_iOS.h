@@ -58,3 +58,6 @@
 //#include <SDL_opengles2_khrplatform.h>
 //#include <SDL_ttf.h>
 //#include <SDL_vulkan.h>
+
+// -- image --
+#include <SDL2/SDL2_image.h>
