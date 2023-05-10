@@ -14,8 +14,12 @@ public final class Surface {
 }
 
 extension Surface {
-    public convenience init?(path: String) {
-        guard let pointer = path.withCString(IMG_Load(_:)) else { return nil }
+    public convenience init(path: String) throws {
+        let pointer = try withThrowingSDL {
+            path.withCString({
+                IMG_Load($0)
+            })
+        }
         self.init(sdlPointer: pointer)
     }
 }

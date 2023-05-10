@@ -1,34 +1,46 @@
+import Foundation
 import Lark
 import Logging
 import SDL2
 
-final class ExampleGame: Game {
+@MainActor
+final class ExampleGame: GameProtocol {
     var isRunning: Bool = true
-    
-    var window: Window!
-    var renderer: Renderer!
-    var windowSize: ISize2!
+
+    var window: Window
+    var renderer: Renderer
+    var windowSize: ISize2
+
+    var tankImage: Texture
+    var tankPosition: FVector2 = .init(x: 10, y: 10)
+    var tankVelocity: FVector2 = .init(x: 10, y: 10)
+
+    private let tankSize: FSize2 = .init(width: 32, height: 32)
 
     @Environment(\.events) var events
-    @Environment(\.deltaTime) var deltaTime
     @Environment(\.logger) var logger
 
-    init() {}
-
-    @MainActor
-    func setUp() throws {
+    init() throws {
+        let resourcePath = Bundle.module.resourcePath ?? ""
         windowSize = ISize2(width: 800, height: 600)
         window = try Window(
             title: "Hi There!",
             position: .centered,
             size: windowSize,
-            options: [.resizable]
+            options: []
         )
-        try window.setFullScreen()
+//        try window.setFullScreen()
         renderer = try Renderer(window: window, options: [.accelerated, .presentVSync, .targetTexture])
+
+        // draw image
+        let tankSurface = try Surface(path: resourcePath + "/assets/images/tank-tiger-right.png")
+        let tankTexture = try Texture(renderer: renderer, surface: tankSurface)
+        tankImage = tankTexture
     }
 
-    func update() {
+    func update(deltaTime: Duration) {
+        tankPosition += tankVelocity * deltaTime.fractionalSeconds
+        print(deltaTime.formatted(.time(pattern: .hourMinuteSecond(padHourToLength: 0, fractionalSecondsLength: 4))))
         for event in events {
             logger.info("\(event)")
             switch event.kind {
@@ -49,19 +61,13 @@ final class ExampleGame: Game {
         }
     }
 
-    @MainActor
     func render() throws {
         renderer.setColor(Color(red: 21, green: 21, blue: 21))
-        do {
-            try renderer.clear()
-        } catch {
-            logger.error("Render error clearing screen: \(error)")
-        }
-
-        // draw player rect
-        renderer.setColor(Color(red: 0, green: 0.8, blue: 0.8))
-        try renderer.fillRect(IRect2(x: 10, y: 10, width: 20, height: 20))
-
+        try renderer.clear()
+        try renderer.renderCopy(
+            tankImage,
+            destination: FRect2(origin: tankPosition, size: tankSize)
+        )
         renderer.present()
     }
 }
@@ -71,13 +77,12 @@ final class ExampleGame: Game {
 @main
 enum Run {
     static func main() async throws {
-        var environment = EnvironmentValues.current
-        environment.logger = Logger(label: "LarkExample", level: .notice)
-
-        try EnvironmentValues.$current.withValue(environment) {
-            let game = ExampleGame()
-            let engine = try Engine(game: game)
-            engine.run()
+        await EnvironmentValues.withValues {
+            $0.logger = Logger(label: "LarkExample", level: .trace)
+        } perform: {
+            var configuration = EngineConfiguration()
+            configuration.logFrameTiming = true
+            await LarkEngine<ExampleGame>().run(configuration: configuration)
         }
     }
 }

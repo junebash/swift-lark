@@ -1,16 +1,10 @@
-public protocol Game {
+@MainActor
+public protocol GameProtocol {
     var isRunning: Bool { get }
 
-    @MainActor
-    mutating func setUp() throws
+    init() throws
 
-    mutating func update()
+    mutating func update(deltaTime: Duration)
 
-    @MainActor
     func render() throws
-}
-
-extension Game {
-    @MainActor
-    public mutating func setUp() throws {}
 }

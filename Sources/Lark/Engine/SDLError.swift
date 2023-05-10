@@ -12,9 +12,6 @@ public struct SDLError: Error {
 
     @inlinable
     static func get(code: Int32? = nil) -> SDLError? {
-        if let code {
-            guard code > 0 else { return nil }
-        }
         if let messagePointer = SDL_GetError(), messagePointer.pointee != 0 {
             defer { SDL_ClearError() }
             return .init(code: code, description: .init(cString: messagePointer))
@@ -27,7 +24,7 @@ public struct SDLError: Error {
 @inlinable
 func withThrowingSDL(_ operation: () -> Int32) throws {
     let opCode = operation()
-    if let error = SDLError.get(code: opCode) {
+    if opCode != 0, let error = SDLError.get(code: opCode) {
         throw LarkError.sdl(error)
     }
 }

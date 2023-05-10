@@ -35,7 +35,7 @@ let package = Package(
         .executableTarget(
             name: "LarkExample",
             dependencies: ["Lark"],
-            resources: [.process("assets")]
+            resources: [.copy("assets")]
         ),
 
         .target(

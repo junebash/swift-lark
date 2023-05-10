@@ -1,13 +1,10 @@
 import SDL2
 
 extension Event {
-    @usableFromInline
-    @Environment(\.getTicks) static var ticks
-
     @inlinable
     init?(event: SDL_Event) {
         guard let kind = Event.Kind(event: event) else { return nil }
-        self = .init(kind: kind, timestamp: Self.ticks())
+        self = .init(kind: kind, timestamp: EnvironmentValues.current.ticks.get())
     }
 }
 

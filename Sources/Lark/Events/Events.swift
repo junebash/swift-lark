@@ -43,12 +43,12 @@ public struct Events: Sequence, Sendable {
     internal let getEvent: @Sendable () -> Event?
 
     @inlinable
-    init(_ getEvent: @escaping @Sendable () -> Event?) {
+    public init(_ getEvent: @escaping @Sendable () -> Event?) {
         self.getEvent = getEvent
     }
 
     @inlinable
-    internal static func poll() -> Self {
+    public static func poll() -> Self {
         let poll = Event.Poll()
         return .init { poll.next() }
     }

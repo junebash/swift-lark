@@ -59,6 +59,26 @@ extension Renderer {
             }
         }
     }
+
+    public func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: IRect2?) throws {
+        try withThrowingSDL {
+            withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
+                withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_Rect.self) { dstPtr in
+                    SDL_RenderCopy(_sdlRendererPointer, texture.sdlPointer, srcPtr, dstPtr)
+                }
+            }
+        }
+    }
+
+    public func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: FRect2?) throws {
+        try withThrowingSDL {
+            withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
+                withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_FRect.self) { dstPtr in
+                    SDL_RenderCopyF(_sdlRendererPointer, texture.sdlPointer, srcPtr, dstPtr)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Options
