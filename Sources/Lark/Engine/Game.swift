@@ -1,10 +1,12 @@
 @MainActor
 public protocol GameProtocol {
-    var isRunning: Bool { get }
+  var isRunning: Bool { get }
 
-    init() throws
+  init() throws
 
-    mutating func update(deltaTime: Duration)
+  func setup(with engine: )
 
-    func render() throws
+  mutating func update(deltaTime: LarkDuration)
+
+  func render() throws
 }

@@ -1,6 +1,6 @@
 extension Duration {
-    @inlinable
-    public var fractionalSeconds: Float {
-        Float(components.seconds) + (Float(components.attoseconds) * 0.000_000_000__000_000_001)
-    }
+  @inlinable
+  public func fractionalSeconds<T: BinaryFloatingPoint>(_: T.Type = Float.self) -> T {
+    T(components.seconds) + (T(components.attoseconds) * 0.000_000_000__000_000_001)
+  }
 }

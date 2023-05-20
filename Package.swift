@@ -10,13 +10,22 @@ let package = Package(
             name: "swift-lark",
             targets: ["Lark"]
         ),
-        .executable(name: "LarkExample", targets: ["LarkExample"])
+        .executable(name: "LarkExample", targets: ["LarkExample"]),
+        .library(name: "SDL2Image", targets: ["SDL2Image"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-async-algorithms", from: .init(0, 0, 3)),
-        .package(url: "https://github.com/apple/swift-log", from: .init(1, 5, 2)),
-        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: .init(0, 6, 0)),
-        .package(url: "https://github.com/pointfreeco/swift-clocks", from: .init(0, 2, 0))
+        .package(url: "https://github.com/apple/swift-async-algorithms", from: Version(0, 0, 3)),
+        .package(url: "https://github.com/apple/swift-log", from: Version(1, 5, 2)),
+        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: Version(0, 6, 0)),
+        .package(url: "https://github.com/pointfreeco/swift-clocks", from: Version(0, 2, 0)),
+        .package(url: "https://github.com/junebash/swift-uuid", branch: "main"),
+        .package(url: "https://github.com/junebash/swift-lock", branch: "main"),
+        .package(url: "https://github.com/apple/swift-collections", branch: "main"),
+        .package(
+          url: "https://github.com/pointfreeco/swift-identified-collections.git",
+          .upToNextMajor(from: Version(0, 7, 1))
+        ),
+        .package(url: "https://github.com/junebash/swift-gen", branch: "protocol")
     ],
     targets: [
         .target(
@@ -27,7 +36,12 @@ let package = Package(
                 .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
                 .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
                 .product(name: "Clocks", package: "swift-clocks"),
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "UUID", package: "swift-uuid"),
+                .product(name: "Lock", package: "swift-lock"),
+                .product(name: "Collections", package: "swift-collections"),
+                .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
+                .product(name: "Gen", package: "swift-gen")
             ],
             swiftSettings: [.unsafeFlags(["-Xfrontend", "-warn-concurrency"])]
         ),
@@ -55,7 +69,10 @@ let package = Package(
 
         .target(
             name: "SDL2Image",
-            dependencies: ["CSDL2Image"]
+            dependencies: [
+              "CSDL2Image",
+              "SDL2"
+            ]
         ),
         .systemLibrary(
             name: "CSDL2Image",

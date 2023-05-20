@@ -19,12 +19,57 @@
       }
     },
     {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "branch" : "main",
+        "revision" : "939cfd25234472b4dc91c3caeab304d15bca9a73"
+      }
+    },
+    {
+      "identity" : "swift-gen",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/junebash/swift-gen",
+      "state" : {
+        "branch" : "protocol",
+        "revision" : "6688ffd930314f79fb23b4a75456d75a09da9d5c"
+      }
+    },
+    {
+      "identity" : "swift-identified-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-identified-collections.git",
+      "state" : {
+        "revision" : "f52eee28bdc6065aa2f8424067e6f04c74bda6e6",
+        "version" : "0.7.1"
+      }
+    },
+    {
+      "identity" : "swift-lock",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/junebash/swift-lock",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0ddc399f8aa684af1c29d3069fb2f9765eb03739"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
         "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
         "version" : "1.5.2"
+      }
+    },
+    {
+      "identity" : "swift-uuid",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/junebash/swift-uuid",
+      "state" : {
+        "branch" : "main",
+        "revision" : "096b90e8058d9d9d51287a3a534b43ad3c4efcd9"
       }
     },
     {

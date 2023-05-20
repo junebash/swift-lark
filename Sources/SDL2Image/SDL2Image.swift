@@ -1,3 +1,4 @@
+import SDL2
 @_exported import CSDL2Image
 
 //public let IMG_INIT_ALL: Int32 = .init(
