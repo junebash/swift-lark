@@ -22,8 +22,8 @@ let package = Package(
         .package(url: "https://github.com/junebash/swift-lock", branch: "main"),
         .package(url: "https://github.com/apple/swift-collections", branch: "main"),
         .package(
-          url: "https://github.com/pointfreeco/swift-identified-collections.git",
-          .upToNextMajor(from: Version(0, 7, 1))
+            url: "https://github.com/pointfreeco/swift-identified-collections.git",
+            .upToNextMajor(from: Version(0, 7, 1))
         ),
         .package(url: "https://github.com/junebash/swift-gen", branch: "protocol")
     ],
@@ -63,15 +63,15 @@ let package = Package(
             pkgConfig: "sdl2",
             providers: [
                 .brew(["sdl2"]),
-                .apt(["libsdl2-dev"]),
+                .apt(["libsdl2-dev"])
             ]
         ),
 
         .target(
             name: "SDL2Image",
             dependencies: [
-              "CSDL2Image",
-              "SDL2"
+                "CSDL2Image",
+                "SDL2"
             ]
         ),
         .systemLibrary(
@@ -88,6 +88,6 @@ let package = Package(
             name: "LarkTests",
             dependencies: ["Lark"],
             swiftSettings: [.unsafeFlags(["-Xfrontend", "-warn-concurrency"])]
-        ),
+        )
     ]
 )

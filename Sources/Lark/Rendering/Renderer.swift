@@ -1,3 +1,23 @@
+// Copyright (c) 2023 June Bash
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import SDL2
 
 @MainActor
@@ -16,9 +36,9 @@ public final class Renderer {
     }
 }
 
-extension Renderer {
+public extension Renderer {
     @inlinable
-    public func setColor(_ color: Color) {
+    func setColor(_ color: Color) {
         SDL_SetRenderDrawColor(
             _sdlRendererPointer,
             color.red,
@@ -29,18 +49,18 @@ extension Renderer {
     }
 
     @inlinable
-    public func clear() throws {
+    func clear() throws {
         try withThrowingSDL {
             SDL_RenderClear(_sdlRendererPointer)
         }
     }
 
     @inlinable
-    public func present() {
+    func present() {
         SDL_RenderPresent(_sdlRendererPointer)
     }
 
-    public func fillRect(_ rect: IRect2) throws {
+    func fillRect(_ rect: IRect2) throws {
         try withThrowingSDL {
             withUnsafePointer(to: rect) { ptr in
                 ptr.withMemoryRebound(to: SDL_Rect.self, capacity: 1) { sdlPtr in
@@ -50,7 +70,7 @@ extension Renderer {
         }
     }
 
-    public func fillRect(_ rect: FRect2) throws {
+    func fillRect(_ rect: FRect2) throws {
         try withThrowingSDL {
             withUnsafePointer(to: rect) { ptr in
                 ptr.withMemoryRebound(to: SDL_FRect.self, capacity: 1) { sdlPtr in
@@ -60,7 +80,7 @@ extension Renderer {
         }
     }
 
-    public func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: IRect2?) throws {
+    func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: IRect2?) throws {
         try withThrowingSDL {
             withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
                 withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_Rect.self) { dstPtr in
@@ -70,7 +90,7 @@ extension Renderer {
         }
     }
 
-    public func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: FRect2?) throws {
+    func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: FRect2?) throws {
         try withThrowingSDL {
             withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
                 withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_FRect.self) { dstPtr in
@@ -83,8 +103,8 @@ extension Renderer {
 
 // MARK: - Options
 
-extension Renderer {
-    public struct Options: OptionSet, Sendable {
+public extension Renderer {
+    struct Options: OptionSet, Sendable {
         public var rawValue: UInt32
 
         public init(rawValue: UInt32) {

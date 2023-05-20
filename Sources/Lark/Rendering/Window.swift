@@ -1,3 +1,23 @@
+// Copyright (c) 2023 June Bash
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import SDL2
 
 @MainActor
@@ -58,8 +78,8 @@ public final class Window {
     }
 }
 
-extension Window {
-    public enum Position {
+public extension Window {
+    enum Position {
         case centered
         case undefined
 
@@ -71,7 +91,7 @@ extension Window {
         }
     }
 
-    public struct Options: OptionSet {
+    struct Options: OptionSet {
         public var rawValue: UInt32
 
         public init(rawValue: UInt32) {
@@ -103,54 +123,54 @@ extension Window {
         public static let inputGrabbed: Self = .init(rawValue: SDL_WINDOW_INPUT_GRABBED.rawValue)
 
         /*
-         /**< fullscreen window */
+         /** < fullscreen window */
          public var SDL_WINDOW_FULLSCREEN: SDL_WindowFlags { get }
-         /**< window usable with OpenGL context */
+         /** < window usable with OpenGL context */
          public var SDL_WINDOW_OPENGL: SDL_WindowFlags { get }
-         /**< window is visible */
+         /** < window is visible */
          public var SDL_WINDOW_SHOWN: SDL_WindowFlags { get }
-         /**< window is not visible */
+         /** < window is not visible */
          public var SDL_WINDOW_HIDDEN: SDL_WindowFlags { get }
-         /**< no window decoration */
+         /** < no window decoration */
          public var SDL_WINDOW_BORDERLESS: SDL_WindowFlags { get }
-         /**< window can be resized */
+         /** < window can be resized */
          public var SDL_WINDOW_RESIZABLE: SDL_WindowFlags { get }
-         /**< window is minimized */
+         /** < window is minimized */
          public var SDL_WINDOW_MINIMIZED: SDL_WindowFlags { get }
-         /**< window is maximized */
+         /** < window is maximized */
          public var SDL_WINDOW_MAXIMIZED: SDL_WindowFlags { get }
-         /**< window has grabbed mouse input */
+         /** < window has grabbed mouse input */
          public var SDL_WINDOW_MOUSE_GRABBED: SDL_WindowFlags { get }
-         /**< window has input focus */
+         /** < window has input focus */
          public var SDL_WINDOW_INPUT_FOCUS: SDL_WindowFlags { get }
-         /**< window has mouse focus */
+         /** < window has mouse focus */
          public var SDL_WINDOW_MOUSE_FOCUS: SDL_WindowFlags { get }
          public var SDL_WINDOW_FULLSCREEN_DESKTOP: SDL_WindowFlags { get }
-         /**< window not created by SDL */
+         /** < window not created by SDL */
          public var SDL_WINDOW_FOREIGN: SDL_WindowFlags { get }
-         /**< window should be created in high-DPI mode if supported.
+         /** < window should be created in high-DPI mode if supported.
           On macOS NSHighResolutionCapable must be set true in the
           application's Info.plist for this to have any effect. */
          public var SDL_WINDOW_ALLOW_HIGHDPI: SDL_WindowFlags { get }
-         /**< window has mouse captured (unrelated to MOUSE_GRABBED) */
+         /** < window has mouse captured (unrelated to MOUSE_GRABBED) */
          public var SDL_WINDOW_MOUSE_CAPTURE: SDL_WindowFlags { get }
-         /**< window should always be above others */
+         /** < window should always be above others */
          public var SDL_WINDOW_ALWAYS_ON_TOP: SDL_WindowFlags { get }
-         /**< window should not be added to the taskbar */
+         /** < window should not be added to the taskbar */
          public var SDL_WINDOW_SKIP_TASKBAR: SDL_WindowFlags { get }
-         /**< window should be treated as a utility window */
+         /** < window should be treated as a utility window */
          public var SDL_WINDOW_UTILITY: SDL_WindowFlags { get }
-         /**< window should be treated as a tooltip */
+         /** < window should be treated as a tooltip */
          public var SDL_WINDOW_TOOLTIP: SDL_WindowFlags { get }
-         /**< window should be treated as a popup menu */
+         /** < window should be treated as a popup menu */
          public var SDL_WINDOW_POPUP_MENU: SDL_WindowFlags { get }
-         /**< window has grabbed keyboard input */
+         /** < window has grabbed keyboard input */
          public var SDL_WINDOW_KEYBOARD_GRABBED: SDL_WindowFlags { get }
-         /**< window usable for Vulkan surface */
+         /** < window usable for Vulkan surface */
          public var SDL_WINDOW_VULKAN: SDL_WindowFlags { get }
-         /**< window usable for Metal view */
+         /** < window usable for Metal view */
          public var SDL_WINDOW_METAL: SDL_WindowFlags { get }
-         /**< equivalent to SDL_WINDOW_MOUSE_GRABBED for compatibility */
+         /** < equivalent to SDL_WINDOW_MOUSE_GRABBED for compatibility */
          public var SDL_WINDOW_INPUT_GRABBED: SDL_WindowFlags { get }
          */
     }

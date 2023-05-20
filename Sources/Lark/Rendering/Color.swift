@@ -1,3 +1,23 @@
+// Copyright (c) 2023 June Bash
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import SDL2
 
 public struct Color: Sendable {
@@ -23,9 +43,9 @@ public struct Color: Sendable {
 extension Color: Equatable {
     public static func == (lhs: Color, rhs: Color) -> Bool {
         return lhs.sdlColor.r == rhs.sdlColor.r
-        && lhs.sdlColor.g == rhs.sdlColor.g
-        && lhs.sdlColor.b == rhs.sdlColor.b
-        && lhs.sdlColor.a == rhs.sdlColor.a
+            && lhs.sdlColor.g == rhs.sdlColor.g
+            && lhs.sdlColor.b == rhs.sdlColor.b
+            && lhs.sdlColor.a == rhs.sdlColor.a
     }
 }
 
@@ -38,37 +58,36 @@ extension Color: Hashable {
     }
 }
 
-extension Color {
+public extension Color {
     @inlinable
-    public var red: UInt8 {
+    var red: UInt8 {
         _read { yield sdlColor.r }
         _modify { yield &sdlColor.r }
         set { sdlColor.r = newValue }
     }
 
     @inlinable
-    public var green: UInt8 {
+    var green: UInt8 {
         _read { yield sdlColor.g }
         _modify { yield &sdlColor.g }
         set { sdlColor.g = newValue }
     }
 
     @inlinable
-    public var blue: UInt8 {
+    var blue: UInt8 {
         _read { yield sdlColor.b }
         _modify { yield &sdlColor.b }
         set { sdlColor.b = newValue }
     }
 
     @inlinable
-    public var alpha: UInt8 {
+    var alpha: UInt8 {
         _read { yield sdlColor.a }
         _modify { yield &sdlColor.a }
         set { sdlColor.a = newValue }
     }
 
-    public struct Floats {
-
+    struct Floats {
         @usableFromInline
         internal let _or, _og, _ob, _oa: Float
 
@@ -105,7 +124,7 @@ extension Color {
     }
 
     @inlinable
-    public var floats: Floats {
+    var floats: Floats {
         _read {
             yield Floats(
                 red: Color._denormalizeComponent(red),
@@ -130,12 +149,12 @@ extension Color {
         }
     }
 
-    public init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = .max) {
+    init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = .max) {
         self.init(sdlColor: .init(r: red, g: green, b: blue, a: alpha))
     }
 
     @_disfavoredOverload
-    public init(red: Float, green: Float, blue: Float, alpha: Float = 1.0) {
+    init(red: Float, green: Float, blue: Float, alpha: Float = 1.0) {
         self.init(
             red: Color._normalizeComponent(red),
             green: Color._normalizeComponent(green),
@@ -144,12 +163,12 @@ extension Color {
         )
     }
 
-    public init(white: UInt8, alpha: UInt8 = .max) {
+    init(white: UInt8, alpha: UInt8 = .max) {
         self.init(red: white, green: white, blue: white, alpha: alpha)
     }
 
     @_disfavoredOverload
-    public init(white: Float, alpha: Float = 1.0) {
+    init(white: Float, alpha: Float = 1.0) {
         self.init(red: white, green: white, blue: white, alpha: alpha)
     }
 }

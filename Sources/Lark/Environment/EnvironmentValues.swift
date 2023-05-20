@@ -1,74 +1,94 @@
+// Copyright (c) 2023 June Bash
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import Clocks
 
 public struct EnvironmentValues: Sendable {
-  @TaskLocal public static var current: EnvironmentValues = .init()
+    @TaskLocal public static var current: EnvironmentValues = .init()
 
-  @usableFromInline
-  internal var values: [ObjectIdentifier: any Sendable] = [:]
+    @usableFromInline
+    internal var values: [ObjectIdentifier: any Sendable] = [:]
 
-  public init() {}
+    public init() {}
 
-  @inlinable
-  public subscript<Key: EnvironmentKey>(key: Key.Type) -> Key.Value {
-    get { values[ObjectIdentifier(key)] as? Key.Value ?? key.defaultValue }
-    set { values[ObjectIdentifier(key)] = newValue }
-  }
+    @inlinable
+    public subscript<Key: EnvironmentKey>(key: Key.Type) -> Key.Value {
+        get { values[ObjectIdentifier(key)] as? Key.Value ?? key.defaultValue }
+        set { values[ObjectIdentifier(key)] = newValue }
+    }
 
-  public static func withValues<R>(
-    _ update: (inout EnvironmentValues) -> Void,
-    perform operation: () throws -> R
-  ) rethrows -> R {
-    var values = Self.current
-    update(&values)
-    return try EnvironmentValues.$current.withValue(values, operation: operation)
-  }
+    public static func withValues<R>(
+        _ update: (inout EnvironmentValues) -> Void,
+        perform operation: () throws -> R
+    ) rethrows -> R {
+        var values = Self.current
+        update(&values)
+        return try EnvironmentValues.$current.withValue(values, operation: operation)
+    }
 
-  public static func withValues<R>(
-    _ update: (inout EnvironmentValues) -> Void,
-    perform operation: () async throws -> R
-  ) async rethrows -> R {
-    var values = Self.current
-    update(&values)
-    return try await EnvironmentValues.$current.withValue(values, operation: operation)
-  }
+    public static func withValues<R>(
+        _ update: (inout EnvironmentValues) -> Void,
+        perform operation: () async throws -> R
+    ) async rethrows -> R {
+        var values = Self.current
+        update(&values)
+        return try await EnvironmentValues.$current.withValue(values, operation: operation)
+    }
 }
 
 /*
-public struct Components: Sendable {
-  @usableFromInline
-  internal struct Key: Hashable, Sendable {
-    let entityID: EntityID
-    let componentObjectID: ObjectIdentifier
+ public struct Components: Sendable {
+   @usableFromInline
+   internal struct Key: Hashable, Sendable {
+     let entityID: EntityID
+     let componentObjectID: ObjectIdentifier
 
-    @usableFromInline
-    init(entityID: EntityID, componentObjectID: ObjectIdentifier) {
-      self.entityID = entityID
-      self.componentObjectID = componentObjectID
-    }
-  }
+     @usableFromInline
+     init(entityID: EntityID, componentObjectID: ObjectIdentifier) {
+       self.entityID = entityID
+       self.componentObjectID = componentObjectID
+     }
+   }
 
-  @TaskLocal public static var current: Components = .init()
+   @TaskLocal public static var current: Components = .init()
 
-  @usableFromInline
-  internal var values: [Key: any Sendable] = [:]
+   @usableFromInline
+   internal var values: [Key: any Sendable] = [:]
 
-  public func getComponent<K: ComponentKey>(
-    _ componentKey: K.Type,
-    for entityID: EntityID
-  ) -> K.Value {
-    let key = Key(entityID: entityID, componentObjectID: ObjectIdentifier(K.self))
-    if let component = values[key] as? K.Value {
-      return component
-    } else {
+   public func getComponent<K: ComponentKey>(
+     _ componentKey: K.Type,
+     for entityID: EntityID
+   ) -> K.Value {
+     let key = Key(entityID: entityID, componentObjectID: ObjectIdentifier(K.self))
+     if let component = values[key] as? K.Value {
+       return component
+     } else {
 
-    }
-  }
+     }
+   }
 
-  public func removeComponent<K: ComponentKey>(
-    _ componentKey: K.Type,
-    for entityID: EntityID
-  ) -> K.Value {
+   public func removeComponent<K: ComponentKey>(
+     _ componentKey: K.Type,
+     for entityID: EntityID
+   ) -> K.Value {
 
-  }
-}
-*/
+   }
+ }
+ */
