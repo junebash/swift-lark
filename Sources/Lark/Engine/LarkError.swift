@@ -19,6 +19,6 @@
 // SOFTWARE.
 
 public enum LarkError: Error {
-    case sdl(SDLError)
-    case unknown
+  case sdl(SDLError)
+  case unknown
 }

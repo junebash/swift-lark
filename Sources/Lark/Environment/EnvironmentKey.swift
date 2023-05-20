@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 public protocol EnvironmentKey<Value>: Sendable {
-    associatedtype Value: Sendable = Self
+  associatedtype Value: Sendable = Self
 
-    static var defaultValue: Value { get }
+  static var defaultValue: Value { get }
 }

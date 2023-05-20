@@ -19,11 +19,11 @@
 // SOFTWARE.
 
 internal struct UncheckedSendable<Value>: @unchecked Sendable {
-    @usableFromInline
-    internal var value: Value
+  @usableFromInline
+  internal var value: Value
 
-    @inlinable
-    init(_ value: Value) {
-        self.value = value
-    }
+  @inlinable
+  init(_ value: Value) {
+    self.value = value
+  }
 }

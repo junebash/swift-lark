@@ -21,8 +21,8 @@
 import Logging
 
 public extension Logger {
-    init(label: String, level: Logger.Level) {
-        self.init(label: label)
-        self.logLevel = level
-    }
+  init(label: String, level: Logger.Level) {
+    self.init(label: label)
+    self.logLevel = level
+  }
 }

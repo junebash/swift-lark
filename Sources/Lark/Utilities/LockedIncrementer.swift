@@ -22,21 +22,21 @@ import Lock
 
 @usableFromInline
 internal struct LockedIncrementer<Value: Numeric> {
-    @usableFromInline
-    let value: Lock<Value>
+  @usableFromInline
+  let value: Lock<Value>
 
-    @usableFromInline
-    init() {
-        self.value = .init(unchecked: .zero)
-    }
+  @usableFromInline
+  init() {
+    self.value = .init(unchecked: .zero)
+  }
 
-    @inlinable
-    func next() -> Value {
-        value.withLock { value in
-            defer { value += 1 }
-            return value
-        }
+  @inlinable
+  func next() -> Value {
+    value.withLock { value in
+      defer { value += 1 }
+      return value
     }
+  }
 }
 
 extension LockedIncrementer: Sendable where Value: Sendable {}

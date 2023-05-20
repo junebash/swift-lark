@@ -22,12 +22,12 @@ import Clocks
 import SDL2
 
 public extension EnvironmentValues {
-    var updateClock: LarkClock {
-        get { self[UpdateClockKey.self] }
-        set { self[UpdateClockKey.self] = newValue }
-    }
+  var updateClock: LarkClock {
+    get { self[UpdateClockKey.self] }
+    set { self[UpdateClockKey.self] = newValue }
+  }
 }
 
 private enum UpdateClockKey: EnvironmentKey {
-    static let defaultValue: LarkClock = .live
+  static let defaultValue: LarkClock = .live
 }

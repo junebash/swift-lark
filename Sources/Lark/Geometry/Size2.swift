@@ -19,22 +19,22 @@
 // SOFTWARE.
 
 public struct Size2<Span: Numeric> {
-    public var width: Span
-    public var height: Span
+  public var width: Span
+  public var height: Span
 
-    @inlinable
-    public init(width: Span, height: Span) {
-        self.width = width
-        self.height = height
-    }
+  @inlinable
+  public init(width: Span, height: Span) {
+    self.width = width
+    self.height = height
+  }
 
-    @inlinable
-    public init() {
-        self.init(width: .zero, height: .zero)
-    }
+  @inlinable
+  public init() {
+    self.init(width: .zero, height: .zero)
+  }
 
-    @inlinable
-    public static var zero: Self { .init() }
+  @inlinable
+  public static var zero: Self { .init() }
 }
 
 extension Size2: Equatable where Span: Equatable {}

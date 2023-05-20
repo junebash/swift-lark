@@ -19,25 +19,25 @@
 // SOFTWARE.
 
 public extension Task where Failure == Error {
-    var cancellableValue: Success {
-        get async throws {
-            try await withTaskCancellationHandler {
-                try await self.value
-            } onCancel: {
-                self.cancel()
-            }
-        }
+  var cancellableValue: Success {
+    get async throws {
+      try await withTaskCancellationHandler {
+        try await self.value
+      } onCancel: {
+        self.cancel()
+      }
     }
+  }
 }
 
 public extension Task where Failure == Never {
-    var cancellableValue: Success {
-        get async {
-            await withTaskCancellationHandler {
-                await self.value
-            } onCancel: {
-                self.cancel()
-            }
-        }
+  var cancellableValue: Success {
+    get async {
+      await withTaskCancellationHandler {
+        await self.value
+      } onCancel: {
+        self.cancel()
+      }
     }
+  }
 }

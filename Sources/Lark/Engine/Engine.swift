@@ -26,79 +26,79 @@ import SDL2
 
 @MainActor
 public final class Engine {
-    public struct Configuration: Equatable {
-        public var initOptions: EngineInitOptions = .everything
-        public var logFrameTiming: Bool = false
-        public var targetFrameDuration: LarkDuration = .fps60
+  public struct Configuration: Equatable {
+    public var initOptions: EngineInitOptions = .everything
+    public var logFrameTiming: Bool = false
+    public var targetFrameDuration: LarkDuration = .fps60
 
-        public init() {}
+    public init() {}
+  }
+
+  public let registry: Registry = .init()
+  public let configuration: Configuration
+
+  public init(configuration: Configuration = .init()) {
+    self.configuration = configuration
+  }
+
+  public func run(_ game: __owned some GameProtocol) {
+    @Environment(\.logger) var logger
+    @Environment(\.updateClock) var updateClock
+
+    logger.trace("Running game engine")
+    defer {
+      logger.trace("Engine finished running")
     }
 
-    public let registry: Registry = .init()
-    public let configuration: Configuration
-
-    public init(configuration: Configuration = .init()) {
-        self.configuration = configuration
+    do {
+      try withThrowingSDL {
+        SDL_Init(configuration.initOptions.rawValue)
+      }
+    } catch {
+      logger.error("Error setting up engine: \(error)")
+      return
     }
 
-    public func run(_ game: __owned some GameProtocol) {
-        @Environment(\.logger) var logger
-        @Environment(\.updateClock) var updateClock
+    var lastUpdate = updateClock.now
+    var currentState = game
 
-        logger.trace("Running game engine")
-        defer {
-            logger.trace("Engine finished running")
-        }
+    logger.trace("Starting game loop")
+    do {
+      while currentState.isRunning {
+        let frameStart = updateClock.now
+        let deltaTime = lastUpdate.duration(to: frameStart)
+        lastUpdate = frameStart
+        currentState.update(deltaTime: deltaTime)
 
-        do {
-            try withThrowingSDL {
-                SDL_Init(configuration.initOptions.rawValue)
-            }
-        } catch {
-            logger.error("Error setting up engine: \(error)")
-            return
-        }
-
-        var lastUpdate = updateClock.now
-        var currentState = game
-
-        logger.trace("Starting game loop")
-        do {
-            while currentState.isRunning {
-                let frameStart = updateClock.now
-                let deltaTime = lastUpdate.duration(to: frameStart)
-                lastUpdate = frameStart
-                currentState.update(deltaTime: deltaTime)
-
-                // movementSystem.update()
-                // collisionSystem.update()
-                // damageSystem.update()
+        // movementSystem.update()
+        // collisionSystem.update()
+        // damageSystem.update()
 //        let frameEnd = updateClock.now
 //        let leftoverTime = configuration.targetFrameDuration - frameStart.duration(to: frameEnd)
 //        if leftoverTime > .zero {
 //          updateClock.sleep(for: leftoverTime)
 //        }
-            }
-        } catch {
-            logger.error("Error in game loop: \(error)")
-            return
-        }
+      }
+    } catch {
+      logger.error("Error in game loop: \(error)")
+      return
     }
+  }
 
-    deinit {
-        quit()
-    }
+  deinit {
+    quit()
+  }
 }
 
 public extension Engine {
-    func run(configuration: EngineConfiguration) {}
+  func run(configuration: EngineConfiguration) {}
 
-    func run() {
-        run(configuration: EngineConfiguration())
-    }
+  func run() {
+    run(configuration: EngineConfiguration())
+  }
 
-    nonisolated func quit() {
-        SDL_Quit()
-        EnvironmentValues.current.logger.trace("Engine quit")
-    }
+  nonisolated func quit() {
+    SDL_Quit()
+    EnvironmentValues.current.logger.trace("Engine quit")
+  }
 }

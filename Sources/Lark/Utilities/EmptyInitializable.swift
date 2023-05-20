@@ -19,5 +19,5 @@
 // SOFTWARE.
 
 public protocol EmptyInitializable {
-    init()
+  init()
 }

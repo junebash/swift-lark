@@ -20,13 +20,13 @@
 
 @MainActor
 public protocol GameProtocol {
-    var isRunning: Bool { get }
+  var isRunning: Bool { get }
 
-    init() throws
+  init() throws
 
-    func setup(with engine:)
+  func setup(with engine:)
 
-    mutating func update(deltaTime: LarkDuration)
+  mutating func update(deltaTime: LarkDuration)
 
-    func render() throws
+  func render() throws
 }

@@ -19,38 +19,38 @@
 // SOFTWARE.
 
 public extension FloatingPoint {
-    @inlinable
-    func clamped(to range: ClosedRange<Self>) -> Self {
-        var newValue = self
-        newValue.clamp(to: range)
-        return newValue
-    }
+  @inlinable
+  func clamped(to range: ClosedRange<Self>) -> Self {
+    var newValue = self
+    newValue.clamp(to: range)
+    return newValue
+  }
 
-    @inlinable
-    mutating func clamp(to range: ClosedRange<Self>) {
-        switch self {
-        case range.upperBound...:
-            self = range.upperBound
-        case ..<range.lowerBound:
-            self = range.lowerBound
-        default:
-            return
-        }
+  @inlinable
+  mutating func clamp(to range: ClosedRange<Self>) {
+    switch self {
+    case range.upperBound...:
+      self = range.upperBound
+    case ..<range.lowerBound:
+      self = range.lowerBound
+    default:
+      return
     }
+  }
 }
 
 extension Float {
-    @usableFromInline
-    static let _uint8Max: Float = 255.0
+  @usableFromInline
+  static let _uint8Max: Float = 255.0
 
-    @usableFromInline
-    static let _uint8MaxReciprocal: Float = 0.0039215686274509803921568627450980392156862745098039215686274509
+  @usableFromInline
+  static let _uint8MaxReciprocal: Float = 0.0039215686274509803921568627450980392156862745098039215686274509
 }
 
 public extension Numeric {
-    var nonZero: Self? { self == .zero ? nil : self }
+  var nonZero: Self? { self == .zero ? nil : self }
 }
 
 public extension SignedNumeric where Self: Comparable {
-    var positive: Self? { self > .zero ? self : nil }
+  var positive: Self? { self > .zero ? self : nil }
 }

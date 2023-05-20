@@ -21,9 +21,9 @@
 import SDL2
 
 public enum PixelFormat {
-    public enum Kind {
-        case unknown
-    }
+  public enum Kind {
+    case unknown
+  }
 
-    // TODO: -
+  // TODO: -
 }

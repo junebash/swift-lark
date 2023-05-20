@@ -19,12 +19,12 @@
 // SOFTWARE.
 
 private enum EventsKey: EnvironmentKey {
-    static let defaultValue: Events = .poll()
+  static let defaultValue: Events = .poll()
 }
 
 public extension EnvironmentValues {
-    var events: Events {
-        get { self[EventsKey.self] }
-        set { self[EventsKey.self] = newValue }
-    }
+  var events: Events {
+    get { self[EventsKey.self] }
+    set { self[EventsKey.self] = newValue }
+  }
 }

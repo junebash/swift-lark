@@ -21,12 +21,12 @@
 import Logging
 
 extension Logger: EnvironmentKey {
-    public static let defaultValue: Self = Logger(label: "Lark", level: .notice)
+  public static let defaultValue: Self = Logger(label: "Lark", level: .notice)
 }
 
 public extension EnvironmentValues {
-    var logger: Logger {
-        get { self[Logger.self] }
-        set { self[Logger.self] = newValue }
-    }
+  var logger: Logger {
+    get { self[Logger.self] }
+    set { self[Logger.self] = newValue }
+  }
 }

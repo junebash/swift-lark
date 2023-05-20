@@ -22,24 +22,24 @@ import SDL2
 import SDL2Image
 
 public final class Surface {
-    let sdlPointer: UnsafeMutablePointer<SDL_Surface>
+  let sdlPointer: UnsafeMutablePointer<SDL_Surface>
 
-    init(sdlPointer: UnsafeMutablePointer<SDL_Surface>) {
-        self.sdlPointer = sdlPointer
-    }
+  init(sdlPointer: UnsafeMutablePointer<SDL_Surface>) {
+    self.sdlPointer = sdlPointer
+  }
 
-    deinit {
-        SDL_FreeSurface(sdlPointer)
-    }
+  deinit {
+    SDL_FreeSurface(sdlPointer)
+  }
 }
 
 public extension Surface {
-    convenience init(path: String) throws {
-        let pointer = try withThrowingSDL {
-            path.withCString {
-                IMG_Load($0)
-            }
-        }
-        self.init(sdlPointer: pointer)
+  convenience init(path: String) throws {
+    let pointer = try withThrowingSDL {
+      path.withCString {
+        IMG_Load($0)
+      }
     }
+    self.init(sdlPointer: pointer)
+  }
 }
