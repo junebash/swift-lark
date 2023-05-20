@@ -37,7 +37,7 @@ public final class Engine {
     public let registry: Registry = .init()
     public let configuration: Configuration
 
-    public init(configuration: Configuration) {
+    public init(configuration: Configuration = .init()) {
         self.configuration = configuration
     }
 

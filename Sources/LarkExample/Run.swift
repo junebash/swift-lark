@@ -25,37 +25,38 @@ import SDL2
 
 @MainActor
 final class ExampleGame: GameProtocol {
-    var isRunning: Bool = true
+  var isRunning: Bool = true
 
-    var window: Window
-    var renderer: Renderer
-    var windowSize: ISize2
+  var window: Window
+  var renderer: Renderer
+  var windowSize: ISize2
 
-    init() throws {
-        let resourcePath = Bundle.module.resourcePath ?? ""
-        self.windowSize = ISize2(width: 800, height: 600)
-        self.window = try Window(
-            title: "Hi There!",
-            position: .centered,
-            size: windowSize,
-            options: []
-        )
-        self.renderer = try Renderer(window: window, options: [.accelerated, .presentVSync, .targetTexture])
-    }
+  init() throws {
+    //        let resourcePath = Bundle.module.resourcePath ?? ""
+    self.windowSize = ISize2(width: 800, height: 600)
+    self.window = try Window(
+      title: "Hi There!",
+      position: .centered,
+      size: windowSize,
+      options: []
+    )
+    self.renderer = try Renderer(window: window, options: [.accelerated, .presentVSync, .targetTexture])
+  }
 
-    func update(deltaTime: LarkDuration) {}
+  func update(deltaTime: LarkDuration) {}
 
-    func render() throws {}
+  func render() throws {}
 }
 
 @MainActor
 @main
 enum Run {
-    static func main() async throws {
-        EnvironmentValues.withValues {
-            $0.logger.logLevel = .trace
-        } perform: {
-            engine.run()
-        }
+  static func main() async throws {
+    EnvironmentValues.withValues {
+      $0.logger.logLevel = .trace
+    } perform: {
+      let game = ExampleGame()
+      let engine = Engine()
     }
+  }
 }

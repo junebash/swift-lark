@@ -31,7 +31,7 @@
 --hexliteralcase lowercase
 --ifdef indent
 --importgrouping alpha
---indent 4
+--indent 2
 --indentcase false
 --indentstrings false
 --lifecycle 
