@@ -21,6 +21,7 @@
 import IdentifiedCollections
 import OrderedCollections
 
+@MainActor
 public protocol System: AnyObject {
   var componentSignature: ComponentSignature { get }
   var entityIDs: EntityIDStore { get set }

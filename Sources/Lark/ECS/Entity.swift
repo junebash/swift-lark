@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct EntityID: Hashable, RawRepresentable {
+public struct EntityID: Hashable, RawRepresentable, Sendable {
   public var rawValue: UInt64
 
   public init(rawValue: UInt64) {
@@ -30,14 +30,9 @@ extension EntityID: CustomStringConvertible {
   public var description: String { rawValue.description }
 }
 
+@MainActor
 public protocol Entity: AnyObject, Identifiable where ID == EntityID {
   var registry: Registry { get }
 
   init(id: ID, registry: Registry)
-}
-
-public extension Entity {
-  func withComponent<C: Component>(_: C, operation: (inout C) -> Void) {
-    registry.withComponent(C.self, for: id, operation: operation)
-  }
 }

@@ -18,31 +18,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public final class ComponentPool<C: Component> {
-  private var values: [EntityID: C] = [:]
+private protocol _ComponentPool {
+  func clear()
+  func removeComponent(for entity: EntityID)
+}
 
-  public var count: Int { values.count }
+extension ComponentPool: _ComponentPool {}
 
-  public init() {}
+internal final class ComponentPoolManager {
+  private var componentPools: [ObjectIdentifier: Any] = [:]
 
-  public func withComponent(for entity: EntityID, _ operation: (inout C) -> Void) {
-    guard values.keys.contains(entity) else { return }
-    operation(&values[entity]!)
+  func pool<C: Component>(for: C.Type) -> ComponentPool<C> {
+    if let pool = componentPools[C.objectID] as? ComponentPool<C> {
+      return pool
+    } else {
+      let pool = ComponentPool<C>()
+      componentPools[C.objectID] = pool
+      return pool
+    }
   }
 
-  public func set(_ component: C, for entity: EntityID) {
-    values[entity] = component
+  func clearAll() {
+    for pool in componentPools.values.lazy.compactMap(_anyPool(from:)) {
+      pool.clear()
+    }
   }
 
-  public func getComponent(for entity: EntityID) -> C? {
-    values[entity]
+  func removeAllComponents(for entityID: EntityID) {
+    for pool in componentPools.values.lazy.compactMap(_anyPool(from:)) {
+      pool.removeComponent(for: entityID)
+    }
   }
 
-  public func removeComponent(for entity: EntityID) {
-    values.removeValue(forKey: entity)
-  }
-
-  public func clear() {
-    values.removeAll(keepingCapacity: true)
+  private func _anyPool(from value: Any) -> (any _ComponentPool)? {
+    guard let pool = value as? any _ComponentPool else {
+      assertionFailure("Expected non-ComponentPool in ComponentPoolManager: \(value)")
+      return nil
+    }
+    return pool
   }
 }

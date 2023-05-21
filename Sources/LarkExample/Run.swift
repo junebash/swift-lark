@@ -27,8 +27,8 @@ final class TankEntity: Entity {
   let id: EntityID
   let registry: Registry
 
-  @Proxy var transform: TransformComponent = .init(position: .init(10, 10))
-  @Proxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
+  @ComponentProxy var transform: TransformComponent = .init(position: .init(10, 10))
+  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
 
   init(id: EntityID, registry: Registry) {
     self.id = id

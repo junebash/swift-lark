@@ -18,29 +18,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@MainActor
-public final class MovementSystem: System {
-  public let componentSignature: ComponentSignature
+internal final class ComponentPool<C: Component> {
+  private var values: [EntityID: C] = [:]
 
-  public var entityIDs: EntityIDStore = .init()
+  var count: Int { values.count }
 
-  @Environment(\.registry) private var registry
-  @Environment(\.logger) private var logger
+  init() {}
 
-  public init() {
-    self.componentSignature = ComponentSignature {
-      $0.requireComponent(TransformComponent.self)
-      $0.requireComponent(RigidBodyComponent.self)
+  subscript(entityID entityID: EntityID) -> C {
+    _read {
+      yield values[entityID, default: {
+        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+      }()]
+    }
+    _modify {
+      yield &values[entityID, default: {
+        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+      }()]
+    }
+    set {
+      values[entityID, default: {
+        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+      }()] = newValue
     }
   }
 
-  public func update(deltaTime: LarkDuration) {
-    for entityID in entityIDs {
-      @SystemComponentProxy(TransformComponent.self, entityID: entityID) var transform
-      @SystemComponentProxy(RigidBodyComponent.self, entityID: entityID) var rigidBody
+  func set(_ component: C, for entity: EntityID) {
+    values[entity] = component
+  }
 
-      transform.position += rigidBody.velocity
-      logger.trace("Position for \(entityID) is now \(transform.position)")
-    }
+  func getComponent(for entity: EntityID) -> C? {
+    values[entity]
+  }
+
+  func removeComponent(for entity: EntityID) {
+    values.removeValue(forKey: entity)
+  }
+
+  func clear() {
+    values.removeAll(keepingCapacity: true)
   }
 }

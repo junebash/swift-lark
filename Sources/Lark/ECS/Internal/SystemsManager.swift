@@ -18,7 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-internal struct SystemsManager {
+@MainActor
+internal final class SystemsManager {
   private var systems: [ObjectIdentifier: any System] = [:]
   @Environment(\.logger) private var logger
 
@@ -29,8 +30,8 @@ internal struct SystemsManager {
   }
 
   subscript<S: System>(type: S.Type, default defaultValue: @autoclosure () -> S) -> S {
-    mutating get {
-      if let system = self.system(S.self) {
+    get {
+      if let system = system(S.self) {
         return system
       } else {
         let system = defaultValue()
@@ -52,11 +53,11 @@ internal struct SystemsManager {
     systems[S.typeID] as? S
   }
 
-  mutating func addSystem<S: System>(_ system: S) {
+  func addSystem<S: System>(_ system: S) {
     setSystem(system)
   }
 
-  mutating func setSystem<S: System>(_ system: S?) {
+  func setSystem<S: System>(_ system: S?) {
     systems[S.typeID] = system
   }
 
@@ -64,11 +65,11 @@ internal struct SystemsManager {
     systems.keys.contains(ObjectIdentifier(S.self))
   }
 
-  mutating func removeSystem<S: System>(_: S.Type) {
+  func removeSystem<S: System>(_: S.Type) {
     systems.removeValue(forKey: ObjectIdentifier(S.self))
   }
 
-  mutating func addEntity(
+  func addEntity(
     _ entityID: EntityID,
     toSystemsWithSignature signature: ComponentSignature
   ) {
@@ -79,7 +80,7 @@ internal struct SystemsManager {
     }
   }
 
-  mutating func update(deltaTime: LarkDuration) {
+  func update(deltaTime: LarkDuration) {
     for key in systems.keys {
       systems[key]!.update(deltaTime: deltaTime)
     }

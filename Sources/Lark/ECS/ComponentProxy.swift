@@ -19,34 +19,8 @@
 // SOFTWARE.
 
 @propertyWrapper
-public struct Proxy<C: Component> {
-  private final class Storage {
-    let registry: Registry
-    let id: EntityID
-
-    var wrappedValue: C {
-      get {
-        registry.component(C.self, for: id)!
-      }
-      set {
-        registry.withComponent(C.self, for: id) {
-          $0 = newValue
-        }
-      }
-    }
-
-    init(_ initialValue: C, registry: Registry, id: EntityID) {
-      self.registry = registry
-      self.id = id
-
-      self.registry.addComponent(initialValue, for: id)
-    }
-
-    deinit {
-      registry.removeComponent(C.self, for: id)
-    }
-  }
-
+@MainActor
+public final class ComponentProxy<C: Component> {
   @available(*, unavailable, message: "`Proxy` is only available from types conforming to `Entity`")
   public var wrappedValue: C {
     get { fatalError() }
@@ -56,7 +30,7 @@ public struct Proxy<C: Component> {
   public static subscript<E: Entity>(
     _enclosingInstance instance: E,
     wrapped wrappedKeyPath: ReferenceWritableKeyPath<E, C>,
-    storage storageKeyPath: ReferenceWritableKeyPath<E, Self>
+    storage storageKeyPath: ReferenceWritableKeyPath<E, ComponentProxy<C>>
   ) -> C {
     get {
       storage(instance, wrapped: wrappedKeyPath, storage: storageKeyPath).wrappedValue
@@ -69,18 +43,16 @@ public struct Proxy<C: Component> {
   private static func storage<E: Entity>(
     _ instance: E,
     wrapped wrappedKeyPath: ReferenceWritableKeyPath<E, C>,
-    storage storageKeyPath: ReferenceWritableKeyPath<E, Self>
+    storage storageKeyPath: ReferenceWritableKeyPath<E, ComponentProxy<C>>
   ) -> Storage {
     if let storage = instance[keyPath: storageKeyPath].storage {
       return storage
     } else {
-      let storage = Storage(
-        instance[keyPath: storageKeyPath].fallbackValue,
-        registry: instance.registry,
-        id: instance.id
+      assertionFailure("Proxy wasn't initialized when expected")
+      return instance[keyPath: storageKeyPath].initializeStorage(
+        instance: instance,
+        registry: instance.registry
       )
-      instance[keyPath: storageKeyPath].storage = storage
-      return storage
     }
   }
 
@@ -89,5 +61,59 @@ public struct Proxy<C: Component> {
 
   public init(wrappedValue: C) {
     self.fallbackValue = wrappedValue
+  }
+}
+
+extension ComponentProxy {
+  final class Storage: Sendable {
+    let registry: Registry
+    let id: EntityID
+
+    @MainActor
+    var wrappedValue: C {
+      _read { yield registry[C.self, for: id] }
+      _modify { yield &registry[C.self, for: id] }
+      set { registry[C.self, for: id] = newValue }
+    }
+
+    @MainActor
+    init(_ initialValue: C, registry: Registry, id: EntityID) {
+      self.registry = registry
+      self.id = id
+
+      self.registry.addComponent(initialValue, for: id)
+    }
+
+    deinit {
+      // TODO: Remove task when isolated deinits are stable
+      Task { @MainActor [registry, id] in
+        registry.removeComponent(C.self, for: id)
+      }
+    }
+  }
+}
+
+@MainActor
+internal protocol _Proxy: AnyObject {
+  associatedtype Storage
+
+  @discardableResult
+  func initializeStorage(instance: some Entity, registry: Registry) -> Storage
+}
+
+extension ComponentProxy: _Proxy {
+  @discardableResult
+  internal func initializeStorage(instance: some Entity, registry: Registry) -> Storage {
+    if let storage {
+      assertionFailure("Attempting to initialize storage twice")
+      return storage
+    }
+    let storage = Storage(
+      fallbackValue,
+      registry: instance.registry,
+      id: instance.id
+    )
+    self.storage = storage
+    return storage
   }
 }

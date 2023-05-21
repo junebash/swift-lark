@@ -18,8 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public final class Registry {
-  private var componentPools: [ObjectIdentifier: Any] = [:]
+@MainActor
+public final class Registry: Sendable {
+  private var componentPools: ComponentPoolManager = .init()
   private var systems: SystemsManager = .init()
   private var entityLifetime: EntityLifetimeManager = .init()
   private var entityComponentSignatures: [EntityID: ComponentSignature] = [:]
@@ -33,28 +34,19 @@ public final class Registry {
   public func createEntity<E: Entity>(_: E.Type) -> E {
     let entityID = entityLifetime.createEntityID()
     entityComponentSignatures[entityID] = .init()
-    return E(id: entityID, registry: self)
+    let entity = E(id: entityID, registry: self)
+
+    // initialize proxies
+    let mirror = Mirror(reflecting: entity)
+    for child in mirror.children {
+      guard let proxy = child.value as? any _Proxy else { continue }
+      _ = proxy.initializeStorage(instance: entity, registry: self)
+    }
+
+    return entity
   }
 
   public func removeEntity(_: some Entity) {}
-
-  public func addComponent<C: Component>(_ component: C, for entity: EntityID) {
-    pool(for: C.self).set(component, for: entity)
-    entityComponentSignatures[entity, default: .init()].requireComponent(C.self)
-    logger.info("Component \(C.self) added for entity \(entity)")
-  }
-
-  public func component<C: Component>(_: C.Type, for entity: EntityID) -> C? {
-    pool(for: C.self).getComponent(for: entity)
-  }
-
-  public func withComponent<C: Component>(
-    _: C.Type,
-    for entity: EntityID,
-    operation: (inout C) -> Void
-  ) {
-    pool(for: C.self).withComponent(for: entity, operation)
-  }
 
   public func removeComponent<C: Component>(_: C.Type, for entityID: EntityID) {
     entityComponentSignatures[entityID]?.removeComponent(C.self)
@@ -76,6 +68,23 @@ public final class Registry {
   public func update(deltaTime: LarkDuration) {
     updateEntities()
     systems.update(deltaTime: deltaTime)
+  }
+
+  // MARK: - Internal Methods
+
+  internal subscript<C: Component>(
+    _: C.Type,
+    for entityID: EntityID
+  ) -> C {
+    _read { yield componentPools.pool(for: C.self)[entityID: entityID] }
+    _modify { yield &componentPools.pool(for: C.self)[entityID: entityID] }
+    set { componentPools.pool(for: C.self)[entityID: entityID] = newValue }
+  }
+
+  internal func addComponent<C: Component>(_ component: C, for entity: EntityID) {
+    componentPools.pool(for: C.self).set(component, for: entity)
+    entityComponentSignatures[entity, default: .init()].requireComponent(C.self)
+    logger.info("Component \(C.self) added for entity \(entity)")
   }
 
   // MARK: - Private Methods
@@ -100,17 +109,6 @@ public final class Registry {
   private func addEntityToSystems(_ entityID: EntityID) {
     guard let signature = entityComponentSignatures[entityID] else { return }
     systems.addEntity(entityID, toSystemsWithSignature: signature)
-  }
-
-  private func pool<C: Component>(for componentKey: C.Type) -> ComponentPool<C> {
-    let key = ObjectIdentifier(C.self)
-    if let pool = componentPools[key] as? ComponentPool<C> {
-      return pool
-    } else {
-      let pool = ComponentPool<C>()
-      componentPools[key] = pool
-      return pool
-    }
   }
 }
 

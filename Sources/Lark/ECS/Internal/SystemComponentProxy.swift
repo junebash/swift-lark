@@ -18,29 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+@propertyWrapper
 @MainActor
-public final class MovementSystem: System {
-  public let componentSignature: ComponentSignature
-
-  public var entityIDs: EntityIDStore = .init()
+internal struct SystemComponentProxy<C: Component> {
+  private var fallback: C?
+  private let entityID: EntityID
 
   @Environment(\.registry) private var registry
-  @Environment(\.logger) private var logger
 
-  public init() {
-    self.componentSignature = ComponentSignature {
-      $0.requireComponent(TransformComponent.self)
-      $0.requireComponent(RigidBodyComponent.self)
+  var wrappedValue: C {
+    mutating get {
+      if let fallback {
+        return fallback
+      } else {
+        fallback = registry[C.self, for: entityID]
+        return fallback!
+      }
+    }
+    _modify {
+      yield &registry[C.self, for: entityID]
+    }
+    set {
+      fallback = newValue
+      registry[C.self, for: entityID] = newValue
     }
   }
 
-  public func update(deltaTime: LarkDuration) {
-    for entityID in entityIDs {
-      @SystemComponentProxy(TransformComponent.self, entityID: entityID) var transform
-      @SystemComponentProxy(RigidBodyComponent.self, entityID: entityID) var rigidBody
-
-      transform.position += rigidBody.velocity
-      logger.trace("Position for \(entityID) is now \(transform.position)")
-    }
+  init(_: C.Type = C.self, entityID: EntityID) {
+    self.entityID = entityID
   }
 }
