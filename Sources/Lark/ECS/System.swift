@@ -19,12 +19,15 @@
 // SOFTWARE.
 
 import IdentifiedCollections
+import OrderedCollections
 
 public protocol System: AnyObject {
   var componentSignature: ComponentSignature { get }
-  var entities: Entities { get set }
+  var entityIDs: EntityIDStore { get set }
 
   init()
+
+  func update(deltaTime: LarkDuration)
 }
 
 extension System {
@@ -37,16 +40,24 @@ extension System {
   }
 }
 
-public struct Entities {
-  public private(set) var values: Set<Entity> = []
+public struct EntityIDStore {
+  public private(set) var values: OrderedSet<EntityID> = []
 
   public init() {}
 
-  public mutating func add(_ entity: Entity) {
-    values.insert(entity)
+  public mutating func add(_ entity: EntityID) {
+    values.append(entity)
   }
 
-  public mutating func remove(_ entity: Entity) {
+  public mutating func remove(_ entity: EntityID) {
     values.remove(entity)
+  }
+}
+
+extension EntityIDStore: Sequence {
+  public typealias Iterator = OrderedSet<EntityID>.Iterator
+
+  public func makeIterator() -> OrderedSet<EntityID>.Iterator {
+    values.makeIterator()
   }
 }

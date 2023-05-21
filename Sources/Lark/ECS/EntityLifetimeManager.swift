@@ -18,36 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct EntityLifetimeManager {
+internal struct EntityLifetimeManager {
   @Environment(\.logger) var logger
 
   private var entityCount: UInt64 = 0
-  private var entitiesToBeAdded: [Entity] = []
-  private var entitiesToBeRemoved: [Entity] = []
+  private var entitiesToBeAdded: [EntityID] = []
+  private var entitiesToBeRemoved: [EntityID] = []
 
-  public mutating func createEntity() -> Entity {
+  internal mutating func createEntityID() -> EntityID {
     defer { entityCount += 1 }
 
-    let entity = Entity(id: entityCount)
-    entitiesToBeAdded.append(entity)
+    let entityID = EntityID(rawValue: entityCount)
+    entitiesToBeAdded.append(entityID)
 
-    logger.log(level: .info, "Entity created with ID: \(entity.id)")
+    logger.log(level: .info, "Entity created with ID: \(entityID)")
 
-    return entity
+    return entityID
   }
 
-  public mutating func withEntitiesToAdd(_ operation: (_ toAdd: [Entity]) -> Void) {
+  internal mutating func withEntitiesToAdd(_ operation: (_ toAdd: [EntityID]) -> Void) {
     operation(entitiesToBeAdded)
     entitiesToBeAdded.removeAll(keepingCapacity: true)
   }
 
-  public mutating func withEntitiesToRemove(_ operation: (_ toRemove: [Entity]) -> Void) {
+  internal mutating func withEntitiesToRemove(_ operation: (_ toRemove: [EntityID]) -> Void) {
     operation(entitiesToBeRemoved)
     entitiesToBeRemoved.removeAll(keepingCapacity: true)
   }
 
-  public mutating func removeEntity(_ entity: Entity) {
-    entitiesToBeRemoved.append(entity)
-    logger.log(level: .info, "Removing entity with ID: \(entity.id)")
+  internal mutating func removeEntity(_ entityID: EntityID) {
+    entitiesToBeRemoved.append(entityID)
+    logger.log(level: .info, "Removing entity with ID: \(entityID)")
   }
 }

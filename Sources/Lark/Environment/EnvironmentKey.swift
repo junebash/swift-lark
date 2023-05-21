@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public protocol EnvironmentKey<Value>: Sendable {
+public protocol EnvironmentKey<Value> {
   associatedtype Value: Sendable = Self
 
   static var defaultValue: Value { get }

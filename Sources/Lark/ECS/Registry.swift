@@ -18,14 +18,89 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@MainActor
 public final class Registry {
   private var componentPools: [ObjectIdentifier: Any] = [:]
-  public var systemsManager: SystemsManager = .init()
+  private var systems: SystemsManager = .init()
   private var entityLifetime: EntityLifetimeManager = .init()
-  private var entityComponentSignatures: [Entity: ComponentSignature] = [:]
+  private var entityComponentSignatures: [EntityID: ComponentSignature] = [:]
 
-  public init() {}
+  @Environment(\.logger) var logger
+
+  public nonisolated init() {}
+
+  // MARK: - Public Methods
+
+  public func createEntity<E: Entity>(_: E.Type) -> E {
+    let entityID = entityLifetime.createEntityID()
+    entityComponentSignatures[entityID] = .init()
+    return E(id: entityID, registry: self)
+  }
+
+  public func removeEntity(_: some Entity) {}
+
+  public func addComponent<C: Component>(_ component: C, for entity: EntityID) {
+    pool(for: C.self).set(component, for: entity)
+    entityComponentSignatures[entity, default: .init()].requireComponent(C.self)
+    logger.info("Component \(C.self) added for entity \(entity)")
+  }
+
+  public func component<C: Component>(_: C.Type, for entity: EntityID) -> C? {
+    pool(for: C.self).getComponent(for: entity)
+  }
+
+  public func withComponent<C: Component>(
+    _: C.Type,
+    for entity: EntityID,
+    operation: (inout C) -> Void
+  ) {
+    pool(for: C.self).withComponent(for: entity, operation)
+  }
+
+  public func removeComponent<C: Component>(_: C.Type, for entityID: EntityID) {
+    entityComponentSignatures[entityID]?.removeComponent(C.self)
+//    pool(for: C.self).removeComponent(for: entity)
+  }
+
+  public func entity<C: Component>(_ entity: EntityID, hasComponent: C.Type) -> Bool {
+    entityComponentSignatures[entity]?.hasComponent(C.self) ?? false
+  }
+
+  public func addSystem<S: System>(_: S.Type) {
+    systems.addSystem(S())
+  }
+
+  public func removeSystem<S: System>(_: S.Type) {
+    systems.removeSystem(S.self)
+  }
+
+  public func update(deltaTime: LarkDuration) {
+    updateEntities()
+    systems.update(deltaTime: deltaTime)
+  }
+
+  // MARK: - Private Methods
+
+  private func updateEntities() {
+    entityLifetime.withEntitiesToAdd { toAdd in
+      for entityID in toAdd {
+        guard let signature = entityComponentSignatures[entityID] else {
+          assertionFailure("Entity \(entityID) created without signature")
+          continue
+        }
+        systems.addEntity(entityID, toSystemsWithSignature: signature)
+      }
+    }
+    entityLifetime.withEntitiesToRemove { toRemove in
+      for _ in toRemove {
+        // TODO: Remove the entities that are waiting to be removed from the active systems
+      }
+    }
+  }
+
+  private func addEntityToSystems(_ entityID: EntityID) {
+    guard let signature = entityComponentSignatures[entityID] else { return }
+    systems.addEntity(entityID, toSystemsWithSignature: signature)
+  }
 
   private func pool<C: Component>(for componentKey: C.Type) -> ComponentPool<C> {
     let key = ObjectIdentifier(C.self)
@@ -37,51 +112,17 @@ public final class Registry {
       return pool
     }
   }
+}
 
-  public func createEntity() -> Entity {
-    let entity = entityLifetime.createEntity()
-    entityComponentSignatures[entity] = .init()
-    return entity
-  }
+// MARK: - Environment
 
-  public func removeEntity(_: Entity) {}
+extension Registry: EnvironmentKey {
+  public nonisolated static let defaultValue: Registry = .init()
+}
 
-  public func addComponent<C: Component>(_ component: C, for entity: Entity) {
-    pool(for: C.self).set(component, for: entity)
-    entityComponentSignatures[entity, default: .init()].requireComponent(C.self)
-  }
-
-  public func component<C: Component>(_: C.Type, for entity: Entity) -> C {
-    fatalError()
-  }
-
-  public func removeComponent<C: Component>(_: C.Type, for entity: Entity) {
-    entityComponentSignatures[entity]?.removeComponent(C.self)
-//    pool(for: C.self).removeComponent(for: entity)
-  }
-
-  public func entity<C: Component>(_ entity: Entity, hasComponent: C.Type) -> Bool {
-    entityComponentSignatures[entity]?.hasComponent(C.self) ?? false
-  }
-
-  private func addEntityToSystems(_ entity: Entity) {
-    guard let signature = entityComponentSignatures[entity] else { return }
-  }
-
-  internal func update() {
-    entityLifetime.withEntitiesToAdd { toAdd in
-      for entity in toAdd {
-        guard let signature = entityComponentSignatures[entity] else {
-          assertionFailure("Entity \(entity.id) created without signature")
-          continue
-        }
-        systemsManager.addEntity(entity, toSystemsWithSignature: signature)
-      }
-    }
-    entityLifetime.withEntitiesToRemove { toRemove in
-      for _ in toRemove {
-        // TODO: Remove the entities that are waiting to be removed from the active systems
-      }
-    }
+public extension EnvironmentValues {
+  var registry: Registry {
+    get { self[Registry.self] }
+    set { self[Registry.self] = newValue }
   }
 }

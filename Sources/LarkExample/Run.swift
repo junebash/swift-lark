@@ -23,6 +23,21 @@ import Lark
 import Logging
 import SDL2
 
+final class TankEntity: Entity {
+  let id: EntityID
+  let registry: Registry
+
+  @Proxy var transform: TransformComponent = .init(position: .init(10, 10))
+  @Proxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
+
+  init(id: EntityID, registry: Registry) {
+    self.id = id
+    self.registry = registry
+    _ = transform
+    _ = rigidBody
+  }
+}
+
 @MainActor
 final class ExampleGame: GameProtocol {
   var isRunning: Bool = true
@@ -31,32 +46,64 @@ final class ExampleGame: GameProtocol {
   var renderer: Renderer
   var windowSize: ISize2
 
+  @Environment(\.logger) private var logger
+  @Environment(\.events) private var events
+
+  var tank: TankEntity
+
   init() throws {
+    @Environment(\.registry) var registry
+
     //        let resourcePath = Bundle.module.resourcePath ?? ""
     self.windowSize = ISize2(width: 800, height: 600)
     self.window = try Window(
       title: "Hi There!",
       position: .centered,
       size: windowSize,
-      options: []
+      options: [.openGL]
     )
     self.renderer = try Renderer(window: window, options: [.accelerated, .presentVSync, .targetTexture])
+
+    self.tank = registry.createEntity(TankEntity.self)
   }
 
-  func update(deltaTime: LarkDuration) {}
+  func update(deltaTime: LarkDuration) {
+    for event in events() {
+//      logger.trace("\(event)")
+      switch event.kind {
+      case .quit:
+        isRunning = false
+      case let .keyUp(info) where info.keyCode == .escape:
+        isRunning = false
+      case let .window(_, windowEvent):
+        switch windowEvent {
+        case let .resized(newSize):
+          windowSize = newSize
+        default:
+          break
+        }
+      default:
+        break
+      }
+    }
 
-  func render() throws {}
+    renderer.setColor(Color(red: 0, green: 0.8, blue: 0.8))
+    try! renderer.clear()
+  }
 }
 
 @MainActor
 @main
 enum Run {
+  @Environment(\.registry) private static var registry
+
   static func main() async throws {
-    EnvironmentValues.withValues {
+    try EnvironmentValues.withValues {
       $0.logger.logLevel = .trace
     } perform: {
-      let game = ExampleGame()
-      let engine = Engine()
+      let engine = try Engine()
+      registry.addSystem(MovementSystem.self)
+      try engine.run(ExampleGame())
     }
   }
 }

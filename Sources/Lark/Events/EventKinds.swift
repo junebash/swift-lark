@@ -258,9 +258,12 @@ public enum ControllerAxis: Sendable, Hashable {
 public struct ControllerEventInfo: Sendable, Hashable {
   public struct TouchpadEventInfo: Sendable, Hashable {
     public let index: UInt32
+
     public let fingerIndex: UInt32
+
     /// Normalized 0...1, 0 at top-left
     public let position: FVector2
+
     /// Normalized 0...1
     public let pressure: Double
   }
@@ -275,7 +278,7 @@ public struct ControllerEventInfo: Sendable, Hashable {
     case touchpadDown(TouchpadEventInfo)
     case touchpadMotion(TouchpadEventInfo)
     case touchpadUp(TouchpadEventInfo)
-    case sensorUpdated // TODO:
+    case sensorUpdated // TODO: ??
   }
 
   public let id: UInt32

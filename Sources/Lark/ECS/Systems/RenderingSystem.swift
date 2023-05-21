@@ -19,11 +19,12 @@
 // SOFTWARE.
 
 public final class RenderingSystem: System {
+  public var entityIDs: EntityIDStore = .init()
   public let componentSignature: ComponentSignature
 
   public init() {
-    var sig = ComponentSignature()
-    sig.requireComponent(<#T##Component.Protocol#>)
-    self.componentSignature = sig
+    self.componentSignature = ComponentSignature()
   }
+
+  public func update(deltaTime: LarkDuration) {}
 }

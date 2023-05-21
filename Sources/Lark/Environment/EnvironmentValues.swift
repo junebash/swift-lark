@@ -26,6 +26,11 @@ public struct EnvironmentValues: Sendable {
   @usableFromInline
   internal var values: [ObjectIdentifier: any Sendable] = [:]
 
+  @usableFromInline
+  internal init(values: [ObjectIdentifier: any Sendable]) {
+    self.values = values
+  }
+
   public init() {}
 
   @inlinable
@@ -51,44 +56,8 @@ public struct EnvironmentValues: Sendable {
     update(&values)
     return try await EnvironmentValues.$current.withValue(values, operation: operation)
   }
+
+  public func merging(with other: EnvironmentValues) -> EnvironmentValues {
+    Self(values: values.merging(other.values, uniquingKeysWith: { $1 }))
+  }
 }
-
-/*
- public struct Components: Sendable {
-   @usableFromInline
-   internal struct Key: Hashable, Sendable {
-     let entityID: EntityID
-     let componentObjectID: ObjectIdentifier
-
-     @usableFromInline
-     init(entityID: EntityID, componentObjectID: ObjectIdentifier) {
-       self.entityID = entityID
-       self.componentObjectID = componentObjectID
-     }
-   }
-
-   @TaskLocal public static var current: Components = .init()
-
-   @usableFromInline
-   internal var values: [Key: any Sendable] = [:]
-
-   public func getComponent<K: ComponentKey>(
-     _ componentKey: K.Type,
-     for entityID: EntityID
-   ) -> K.Value {
-     let key = Key(entityID: entityID, componentObjectID: ObjectIdentifier(K.self))
-     if let component = values[key] as? K.Value {
-       return component
-     } else {
-
-     }
-   }
-
-   public func removeComponent<K: ComponentKey>(
-     _ componentKey: K.Type,
-     for entityID: EntityID
-   ) -> K.Value {
-
-   }
- }
- */

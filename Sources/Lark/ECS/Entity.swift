@@ -18,12 +18,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct Entity: Identifiable, Hashable {
-  public typealias ID = UInt64
+public struct EntityID: Hashable, RawRepresentable {
+  public var rawValue: UInt64
 
-  public let id: ID
+  public init(rawValue: UInt64) {
+    self.rawValue = rawValue
+  }
+}
 
-  public init(id: ID) {
-    self.id = id
+extension EntityID: CustomStringConvertible {
+  public var description: String { rawValue.description }
+}
+
+public protocol Entity: AnyObject, Identifiable where ID == EntityID {
+  var registry: Registry { get }
+
+  init(id: ID, registry: Registry)
+}
+
+public extension Entity {
+  func withComponent<C: Component>(_: C, operation: (inout C) -> Void) {
+    registry.withComponent(C.self, for: id, operation: operation)
   }
 }

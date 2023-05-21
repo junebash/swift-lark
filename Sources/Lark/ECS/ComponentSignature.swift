@@ -20,7 +20,7 @@
 
 import BitCollections
 
-public struct ComponentSignature: Equatable, Configurable {
+public struct ComponentSignature: Equatable, Configurable, EmptyInitializable {
   public var components: Set<ObjectIdentifier> = []
 
   public init() {}

@@ -19,21 +19,26 @@
 // SOFTWARE.
 
 public final class ComponentPool<C: Component> {
-  public private(set) var values: [Entity: C] = [:]
+  private var values: [EntityID: C] = [:]
 
   public var count: Int { values.count }
 
   public init() {}
 
-  public func set(_ component: C, for entity: Entity) {
+  public func withComponent(for entity: EntityID, _ operation: (inout C) -> Void) {
+    guard values.keys.contains(entity) else { return }
+    operation(&values[entity]!)
+  }
+
+  public func set(_ component: C, for entity: EntityID) {
     values[entity] = component
   }
 
-  public func getComponent(for entity: Entity) -> C? {
+  public func getComponent(for entity: EntityID) -> C? {
     values[entity]
   }
 
-  public func removeComponent(for entity: Entity) {
+  public func removeComponent(for entity: EntityID) {
     values.removeValue(forKey: entity)
   }
 

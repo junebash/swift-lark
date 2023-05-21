@@ -18,16 +18,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct SystemsManager {
+internal struct SystemsManager {
   private var systems: [ObjectIdentifier: any System] = [:]
+  @Environment(\.logger) private var logger
 
   internal init() {}
 
-  public subscript<S: System>(type: S.Type) -> S? {
+  subscript<S: System>(type: S.Type) -> S? {
     _read { yield systems[S.typeID] as? S }
   }
 
-  public subscript<S: System>(type: S.Type, default defaultValue: @autoclosure () -> S) -> S {
+  subscript<S: System>(type: S.Type, default defaultValue: @autoclosure () -> S) -> S {
     mutating get {
       if let system = self.system(S.self) {
         return system
@@ -47,28 +48,40 @@ public struct SystemsManager {
     }
   }
 
-  public func system<S: System>(_: S.Type = S.self) -> S? {
+  func system<S: System>(_: S.Type = S.self) -> S? {
     systems[S.typeID] as? S
   }
 
-  public mutating func setSystem<S: System>(_ system: S) {
+  mutating func addSystem<S: System>(_ system: S) {
+    setSystem(system)
+  }
+
+  mutating func setSystem<S: System>(_ system: S?) {
     systems[S.typeID] = system
   }
 
-  public func hasSystem<S: System>(_: S.Type) -> Bool {
+  func hasSystem<S: System>(_: S.Type) -> Bool {
     systems.keys.contains(ObjectIdentifier(S.self))
   }
 
-  public mutating func removeSystem<S: System>(_: S.Type) {
+  mutating func removeSystem<S: System>(_: S.Type) {
     systems.removeValue(forKey: ObjectIdentifier(S.self))
   }
 
-  public mutating func addEntity(
-    _ entity: Entity,
+  mutating func addEntity(
+    _ entityID: EntityID,
     toSystemsWithSignature signature: ComponentSignature
   ) {
-    for system in systems.values where system.canOperate(on: signature) {
-      system.entities.add(entity)
+    logger.trace("Adding entity \(entityID) to systems")
+    for (key, system) in systems where system.canOperate(on: signature) {
+      logger.trace("Adding entity \(entityID) to \(type(of: system))")
+      systems[key]!.entityIDs.add(entityID)
+    }
+  }
+
+  mutating func update(deltaTime: LarkDuration) {
+    for key in systems.keys {
+      systems[key]!.update(deltaTime: deltaTime)
     }
   }
 }

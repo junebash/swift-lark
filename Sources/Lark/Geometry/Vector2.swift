@@ -39,6 +39,10 @@ public struct Vector2<Value: Numeric> {
   }
 }
 
+extension Vector2: CustomStringConvertible {
+  public var description: String { "(x: \(x), y: \(y))" }
+}
+
 extension Vector2: Equatable where Value: Equatable {}
 extension Vector2: Hashable where Value: Hashable {}
 extension Vector2: Sendable where Value: Sendable {}
@@ -71,5 +75,5 @@ public extension Vector2 {
     vec.y *= value
   }
 
-  // TODO:
+  // TODO: up, down, left, right, normalized, etc
 }

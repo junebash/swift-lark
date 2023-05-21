@@ -21,17 +21,27 @@
 public final class MovementSystem: System {
   public let componentSignature: ComponentSignature
 
-  public var entities: Entities = .init()
+  public var entityIDs: EntityIDStore = .init()
+
+  @Environment(\.registry) private var registry
+  @Environment(\.logger) private var logger
 
   public init() {
-    var sig = ComponentSignature()
-    sig.requireComponent(TransformComponent.self)
-    sig.requireComponent(<#T##Component.Protocol#>)
-
-    self.componentSignature = sig
+    self.componentSignature = ComponentSignature {
+      $0.requireComponent(TransformComponent.self)
+      $0.requireComponent(RigidBodyComponent.self)
+    }
   }
 
   public func update(deltaTime: LarkDuration) {
+    for entityID in entityIDs {
+      registry.withComponent(TransformComponent.self, for: entityID) { transform in
+        registry.withComponent(RigidBodyComponent.self, for: entityID) { rigidBody in
+          transform.position += (rigidBody.velocity * deltaTime.seconds)
+          logger.trace("Position for \(entityID) is now \(transform.position)")
+        }
+      }
+    }
     // loop entities that system is interested in
     // for entity in entities
     // update position based on velocity

@@ -18,7 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import SDL2
+
+public struct Events: Sendable {
+  private var _getEvents: @Sendable () -> [Event]
+
+  public init(getEvents: @escaping @Sendable () -> [Event]) {
+    self._getEvents = getEvents
+  }
+
+  public func callAsFunction() -> [Event] {
+    autoreleasepool { _getEvents() }
+  }
+}
+
+public extension EnvironmentValues {
+  var events: Events {
+    get { self[EventsKey.self] }
+    set { self[EventsKey.self] = newValue }
+  }
+}
+
+private enum EventsKey: EnvironmentKey {
+  typealias Value = Events
+
+  static let defaultValue: Events = Events { Array(Event.Poll()) }
+}
 
 extension Event {
   @usableFromInline
@@ -32,49 +58,5 @@ extension Event {
       guard SDL_PollEvent(&sdlEvent) == 1 else { return nil }
       return Event(event: sdlEvent)
     }
-  }
-}
-
-public struct Events: Sequence, Sendable {
-  public typealias Element = Event
-
-  public struct Iterator: IteratorProtocol, Sendable {
-    @usableFromInline
-    internal var getEvent: (@Sendable () -> Event?)?
-
-    @inlinable
-    init(getEvent: (@Sendable () -> Event?)?) {
-      self.getEvent = getEvent
-    }
-
-    @inlinable
-    public mutating func next() -> Element? {
-      guard let getEvent else { return nil }
-      if let event = getEvent() {
-        return event
-      } else {
-        self.getEvent = nil
-        return nil
-      }
-    }
-  }
-
-  @usableFromInline
-  internal let getEvent: @Sendable () -> Event?
-
-  @inlinable
-  public init(_ getEvent: @escaping @Sendable () -> Event?) {
-    self.getEvent = getEvent
-  }
-
-  @inlinable
-  public static func poll() -> Self {
-    let poll = Event.Poll()
-    return .init { poll.next() }
-  }
-
-  @inlinable
-  public func makeIterator() -> Iterator {
-    Iterator(getEvent: getEvent)
   }
 }

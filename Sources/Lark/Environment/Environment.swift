@@ -19,14 +19,16 @@
 // SOFTWARE.
 
 @propertyWrapper
-public struct Environment<Value: Sendable>: @unchecked Sendable {
+public struct Environment<Value> {
+  public let initialValues: EnvironmentValues
   public let keyPath: KeyPath<EnvironmentValues, Value>
 
   public var wrappedValue: Value {
-    EnvironmentValues.current[keyPath: keyPath]
+    initialValues.merging(with: .current)[keyPath: keyPath]
   }
 
   public init(_ keyPath: KeyPath<EnvironmentValues, Value>) {
+    self.initialValues = .current
     self.keyPath = keyPath
   }
 }

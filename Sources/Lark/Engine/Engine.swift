@@ -34,70 +34,63 @@ public final class Engine {
     public init() {}
   }
 
-  public let registry: Registry = .init()
   public let configuration: Configuration
 
-  public init(configuration: Configuration = .init()) {
+  @Environment(\.registry) public var registry
+
+  @Environment(\.logger) private var logger
+  @Environment(\.updateClock) private var updateClock
+
+  public init(configuration: Configuration = .init()) throws {
     self.configuration = configuration
-  }
-
-  public func run(_ game: __owned some GameProtocol) {
-    @Environment(\.logger) var logger
-    @Environment(\.updateClock) var updateClock
-
-    logger.trace("Running game engine")
-    defer {
-      logger.trace("Engine finished running")
-    }
 
     do {
       try withThrowingSDL {
         SDL_Init(configuration.initOptions.rawValue)
       }
     } catch {
-      logger.error("Error setting up engine: \(error)")
-      return
+      logger.critical("Error setting up engine: \(error)")
+      throw error
+    }
+
+    logger.info("Game engine initialized")
+  }
+
+  public func run(_ game: __owned some GameProtocol) {
+    logger.trace("Running game engine")
+    defer {
+      logger.trace("Engine finished running")
     }
 
     var lastUpdate = updateClock.now
-    var currentState = game
-
-    logger.trace("Starting game loop")
     do {
+      var currentState = game
       while currentState.isRunning {
         let frameStart = updateClock.now
         let deltaTime = lastUpdate.duration(to: frameStart)
         lastUpdate = frameStart
         currentState.update(deltaTime: deltaTime)
-
+        registry.update(deltaTime: deltaTime)
         // movementSystem.update()
         // collisionSystem.update()
         // damageSystem.update()
-//        let frameEnd = updateClock.now
-//        let leftoverTime = configuration.targetFrameDuration - frameStart.duration(to: frameEnd)
-//        if leftoverTime > .zero {
-//          updateClock.sleep(for: leftoverTime)
-//        }
+        //        let frameEnd = updateClock.now
+        //        let leftoverTime = configuration.targetFrameDuration - frameStart.duration(to: frameEnd)
+        //        if leftoverTime > .zero {
+        //          updateClock.sleep(for: leftoverTime)
+        //        }
+        SDL_Delay(1000 / 240)
       }
     } catch {
-      logger.error("Error in game loop: \(error)")
-      return
+      logger.critical("Error in game loop: \(error)")
     }
   }
 
   deinit {
-    quit()
-  }
-}
-
-public extension Engine {
-  func run(configuration: EngineConfiguration) {}
-
-  func run() {
-    run(configuration: EngineConfiguration())
+    Self.quit()
   }
 
-  nonisolated func quit() {
+  private nonisolated static func quit() {
     SDL_Quit()
     EnvironmentValues.current.logger.trace("Engine quit")
   }
