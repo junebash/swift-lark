@@ -22,9 +22,41 @@ public final class RenderingSystem: System {
   public var entityIDs: EntityIDStore = .init()
   public let componentSignature: ComponentSignature
 
-  public init() {
-    self.componentSignature = ComponentSignature()
+  private let renderer: Renderer
+  private let assetStore: AssetStore
+
+  public init(renderer: Renderer, assetStore: AssetStore) {
+    self.componentSignature = ComponentSignature {
+      $0.requireComponent(TransformComponent.self)
+      $0.requireComponent(SpriteComponent.self)
+    }
+    self.renderer = renderer
+    self.assetStore = assetStore
   }
 
-  public func update(deltaTime: LarkDuration) {}
+  public func update(deltaTime: __shared LarkDuration) throws {
+    renderer.setColor(Color(red: 0, green: 0.1, blue: 0.1))
+    try renderer.clear()
+
+    for entityID in entityIDs {
+      @SystemComponentProxy(entityID: entityID) var transform: TransformComponent
+      @SystemComponentProxy(entityID: entityID) var sprite: SpriteComponent
+
+      let texture = try assetStore.texture(for: sprite.textureAssetID).orThrow()
+
+      try renderer.renderCopy(
+        texture,
+        source: sprite.source,
+        destination: Rect(
+          origin: transform.position,
+          size: FSize2(texture.size) * transform.scale
+        ),
+        rotation: transform.rotation,
+        center: sprite.rotationCenter,
+        flip: sprite.flip
+      )
+    }
+
+    renderer.present()
+  }
 }

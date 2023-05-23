@@ -26,9 +26,7 @@ public protocol System: AnyObject {
   var componentSignature: ComponentSignature { get }
   var entityIDs: EntityIDStore { get set }
 
-  init()
-
-  func update(deltaTime: LarkDuration)
+  func update(deltaTime: __shared LarkDuration) throws
 }
 
 extension System {

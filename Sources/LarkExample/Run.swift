@@ -23,18 +23,40 @@ import Lark
 import Logging
 import SDL2
 
+extension AssetID where AssetType == Texture {
+  static var tankSprite: AssetID { "tankSprite" }
+  static var truckSprite: AssetID { "truckSprite" }
+}
+
 final class TankEntity: Entity {
   let id: EntityID
   let registry: Registry
 
-  @ComponentProxy var transform: TransformComponent = .init(position: .init(10, 10))
+  @ComponentProxy var transform: TransformComponent = .init(
+    position: .init(10, 10),
+    scale: .unit * 3,
+    rotation: .degrees(45)
+  )
   @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
+  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: .tankSprite)
 
   init(id: EntityID, registry: Registry) {
     self.id = id
     self.registry = registry
-    _ = transform
-    _ = rigidBody
+  }
+}
+
+final class TruckEntity: Entity {
+  let id: EntityID
+  let registry: Registry
+
+  @ComponentProxy var transform: TransformComponent = .init(position: .init(10, 10))
+  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(0, 0.5))
+  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: .truckSprite)
+
+  init(id: EntityID, registry: Registry) {
+    self.id = id
+    self.registry = registry
   }
 }
 
@@ -49,12 +71,13 @@ final class ExampleGame: GameProtocol {
   @Environment(\.logger) private var logger
   @Environment(\.events) private var events
 
-  var tank: TankEntity
+  let tank: TankEntity
+  let truck: TruckEntity
 
   init() throws {
     @Environment(\.registry) var registry
+    @Environment(\.assetStore) var assetStore
 
-    //        let resourcePath = Bundle.module.resourcePath ?? ""
     self.windowSize = ISize2(width: 800, height: 600)
     self.window = try Window(
       title: "Hi There!",
@@ -62,14 +85,29 @@ final class ExampleGame: GameProtocol {
       size: windowSize,
       options: [.openGL]
     )
-    self.renderer = try Renderer(window: window, options: [.accelerated, .presentVSync, .targetTexture])
+    self.renderer = try Renderer(
+      window: window,
+      options: [.accelerated, .presentVSync, .targetTexture]
+    )
+    registry.addSystem(MovementSystem())
+    registry.addSystem(RenderingSystem(renderer: renderer, assetStore: assetStore))
 
-    self.tank = registry.createEntity(TankEntity.self)
+    try assetStore.addTexture(
+      at: "/assets/images/tank-tiger-right.png",
+      for: .tankSprite,
+      with: renderer
+    )
+    try assetStore.addTexture(
+      at: "/assets/images/truck-ford-down.png",
+      for: .truckSprite,
+      with: renderer
+    )
+    self.tank = try registry.createEntity(TankEntity.self)
+    self.truck = try registry.createEntity(TruckEntity.self)
   }
 
   func update(deltaTime: LarkDuration) {
     for event in events() {
-//      logger.trace("\(event)")
       switch event.kind {
       case .quit:
         isRunning = false
@@ -86,23 +124,18 @@ final class ExampleGame: GameProtocol {
         break
       }
     }
-
-    renderer.setColor(Color(red: 0, green: 0.8, blue: 0.8))
-    try! renderer.clear()
   }
 }
 
 @MainActor
 @main
 enum Run {
-  @Environment(\.registry) private static var registry
-
   static func main() async throws {
     try EnvironmentValues.withValues {
-      $0.logger.logLevel = .trace
+      $0.logger.logLevel = .info
+      $0.resourcePath = Bundle.module.resourcePath
     } perform: {
       let engine = try Engine()
-      registry.addSystem(MovementSystem.self)
       try engine.run(ExampleGame())
     }
   }

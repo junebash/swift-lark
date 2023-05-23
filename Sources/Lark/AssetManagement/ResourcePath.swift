@@ -18,22 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct TransformComponent: Hashable, Component {
-  public var position: FVector2
-  public var scale: FVector2
-  public var rotation: Angle
+import Foundation
 
-  public init(
-    position: FVector2 = .zero,
-    scale: FVector2 = .unit,
-    rotation: Angle = .zero
-  ) {
-    self.position = position
-    self.scale = scale
-    self.rotation = rotation
-  }
+private enum ResourcePathKey: EnvironmentKey {
+  static let defaultValue: String? = Bundle.main.resourcePath
+}
 
-  public init() {
-    self.init(position: .zero, scale: .zero, rotation: .zero)
+public extension EnvironmentValues {
+  var resourcePath: String? {
+    get { self[ResourcePathKey.self] }
+    set { self[ResourcePathKey.self] = newValue }
   }
 }

@@ -18,22 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct TransformComponent: Hashable, Component {
-  public var position: FVector2
-  public var scale: FVector2
-  public var rotation: Angle
+public enum Endianness {
+  case big, little
 
-  public init(
-    position: FVector2 = .zero,
-    scale: FVector2 = .unit,
-    rotation: Angle = .zero
-  ) {
-    self.position = position
-    self.scale = scale
-    self.rotation = rotation
-  }
-
-  public init() {
-    self.init(position: .zero, scale: .zero, rotation: .zero)
-  }
+  public static let current: Endianness = {
+    if 42.bigEndian == 42 {
+      return .big
+    } else {
+      return .little
+    }
+  }()
 }

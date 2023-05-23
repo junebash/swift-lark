@@ -60,7 +60,7 @@ public extension Renderer {
     SDL_RenderPresent(_sdlRendererPointer)
   }
 
-  func fillRect(_ rect: IRect2) throws {
+  func fillRect(_ rect: IRect) throws {
     try withThrowingSDL {
       withUnsafePointer(to: rect) { ptr in
         ptr.withMemoryRebound(to: SDL_Rect.self, capacity: 1) { sdlPtr in
@@ -70,7 +70,7 @@ public extension Renderer {
     }
   }
 
-  func fillRect(_ rect: FRect2) throws {
+  func fillRect(_ rect: FRect) throws {
     try withThrowingSDL {
       withUnsafePointer(to: rect) { ptr in
         ptr.withMemoryRebound(to: SDL_FRect.self, capacity: 1) { sdlPtr in
@@ -80,7 +80,7 @@ public extension Renderer {
     }
   }
 
-  func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: IRect2?) throws {
+  func renderCopy(_ texture: Texture, source: IRect? = nil, destination: IRect?) throws {
     try withThrowingSDL {
       withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
         withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_Rect.self) { dstPtr in
@@ -90,7 +90,11 @@ public extension Renderer {
     }
   }
 
-  func renderCopy(_ texture: Texture, source: IRect2? = nil, destination: FRect2?) throws {
+  func renderCopy(
+    _ texture: Texture,
+    source: __shared IRect? = nil,
+    destination: __shared FRect?
+  ) throws {
     try withThrowingSDL {
       withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
         withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_FRect.self) { dstPtr in
@@ -98,6 +102,51 @@ public extension Renderer {
         }
       }
     }
+  }
+
+  func renderCopy(
+    _ texture: Texture,
+    source: __shared IRect? = nil,
+    destination: __shared FRect?,
+    rotation: Angle,
+    center: FVector2? = nil,
+    flip: AxisSet = .none
+  ) throws {
+    try withThrowingSDL {
+      withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
+        withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_FRect.self) { dstPtr in
+          withUnsafeOptionalSDLPointer(to: center, reboundTo: SDL_FPoint.self) { centerPtr in
+            SDL_RenderCopyExF(
+              _sdlRendererPointer,
+              texture.sdlPointer,
+              srcPtr,
+              dstPtr,
+              rotation.degrees,
+              centerPtr,
+              flip.sdlRendererFlip
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+// TODO: Move
+
+public struct AxisSet: OptionSet {
+  public var rawValue: UInt8
+
+  public init(rawValue: UInt8) {
+    self.rawValue = rawValue
+  }
+
+  public static let none: Self = []
+  public static let horizontal: Self = .init(rawValue: 1)
+  public static let vertical: Self = .init(rawValue: 2)
+
+  internal var sdlRendererFlip: SDL_RendererFlip {
+    .init(UInt32(rawValue))
   }
 }
 

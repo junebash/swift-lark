@@ -21,12 +21,47 @@
 import SDL2
 
 public final class Texture {
+  public struct Metadata {
+    public var size: ISize2
+    public var formatKind: PixelFormat.Kind
+    public var accessRawValue: Int32 // TODO: Add actual 'access' type
+  }
+
   let sdlPointer: OpaquePointer
 
+  public var size: ISize2 {
+    var size = ISize2()
+    SDL_QueryTexture(sdlPointer, nil, nil, &size.width, &size.height)
+    return size
+  }
+
   public init(renderer: Renderer, surface: Surface) throws {
-    self.sdlPointer = try withThrowingSDL {
+    let texturePointer = try withThrowingSDL {
       SDL_CreateTextureFromSurface(renderer._sdlRendererPointer, surface.sdlPointer)
     }
+    self.sdlPointer = texturePointer
+    // TODO: Format, Access
+  }
+
+  public func metadata() throws -> Metadata {
+    var formatRawValue: UInt32 = 0
+    var accessRawValue: Int32 = 0
+    var width: Int32 = 0
+    var height: Int32 = 0
+    try withThrowingSDL {
+      SDL_QueryTexture(
+        sdlPointer,
+        &formatRawValue,
+        &accessRawValue,
+        &width,
+        &height
+      )
+    }
+    return Metadata(
+      size: ISize2(width: width, height: height),
+      formatKind: PixelFormat.Kind(rawValue: formatRawValue),
+      accessRawValue: accessRawValue
+    )
   }
 
   deinit {

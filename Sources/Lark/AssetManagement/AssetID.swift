@@ -18,22 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct TransformComponent: Hashable, Component {
-  public var position: FVector2
-  public var scale: FVector2
-  public var rotation: Angle
+public struct AssetID<AssetType>: Hashable, RawRepresentable {
+  public var rawValue: String
 
-  public init(
-    position: FVector2 = .zero,
-    scale: FVector2 = .unit,
-    rotation: Angle = .zero
-  ) {
-    self.position = position
-    self.scale = scale
-    self.rotation = rotation
+  public init(rawValue: String) {
+    self.init(rawValue)
   }
 
-  public init() {
-    self.init(position: .zero, scale: .zero, rotation: .zero)
+  public init(_ rawValue: String) {
+    self.rawValue = rawValue
+  }
+}
+
+extension AssetID: ExpressibleByStringLiteral {
+  public init(stringLiteral: String) {
+    self.init(stringLiteral)
   }
 }

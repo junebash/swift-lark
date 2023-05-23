@@ -89,33 +89,38 @@ public extension Color {
 
   struct Floats {
     @usableFromInline
-    internal let _or, _og, _ob, _oa: Float
+    internal let _or, _og, _ob, _oa: () -> Float
 
     @usableFromInline
     internal var _nr, _ng, _nb, _na: Float?
 
     public var red: Float {
-      _read { yield _nr ?? _or }
+      _read { yield _nr ?? _or() }
       set { _nr = newValue }
     }
 
     public var green: Float {
-      _read { yield _ng ?? _og }
+      _read { yield _ng ?? _og() }
       set { _ng = newValue }
     }
 
     public var blue: Float {
-      _read { yield _nb ?? _ob }
+      _read { yield _nb ?? _ob() }
       set { _nb = newValue }
     }
 
     public var alpha: Float {
-      _read { yield _na ?? _oa }
+      _read { yield _na ?? _oa() }
       set { _na = newValue }
     }
 
     @inlinable
-    internal init(red: Float, green: Float, blue: Float, alpha: Float) {
+    internal init(
+      red: @autoclosure @escaping () -> Float,
+      green: @autoclosure @escaping () -> Float,
+      blue: @autoclosure @escaping () -> Float,
+      alpha: @autoclosure @escaping () -> Float
+    ) {
       self._or = red
       self._og = green
       self._ob = blue
@@ -126,12 +131,11 @@ public extension Color {
   @inlinable
   var floats: Floats {
     _read {
-      yield Floats(
-        red: Color._denormalizeComponent(red),
-        green: Color._denormalizeComponent(green),
-        blue: Color._denormalizeComponent(blue),
-        alpha: Color._denormalizeComponent(alpha)
-      )
+      yield makeFloats()
+    }
+    _modify {
+      var floats = makeFloats()
+      yield &floats
     }
     set(newFloats) {
       if let red = newFloats._nr {
@@ -147,6 +151,16 @@ public extension Color {
         self.alpha = Color._normalizeComponent(alpha)
       }
     }
+  }
+
+  @inlinable
+  internal func makeFloats() -> Floats {
+    Floats(
+      red: Color._denormalizeComponent(red),
+      green: Color._denormalizeComponent(green),
+      blue: Color._denormalizeComponent(blue),
+      alpha: Color._denormalizeComponent(alpha)
+    )
   }
 
   init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = .max) {
@@ -171,4 +185,10 @@ public extension Color {
   init(white: Float, alpha: Float = 1.0) {
     self.init(red: white, green: white, blue: white, alpha: alpha)
   }
+}
+
+// MARK: - Statics
+
+public extension Color {
+  static let white: Color = .init(white: 1.0)
 }

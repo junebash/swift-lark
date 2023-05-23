@@ -18,22 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct TransformComponent: Hashable, Component {
-  public var position: FVector2
-  public var scale: FVector2
-  public var rotation: Angle
+public extension Optional {
+  struct UnwrapError: Error {}
 
-  public init(
-    position: FVector2 = .zero,
-    scale: FVector2 = .unit,
-    rotation: Angle = .zero
-  ) {
-    self.position = position
-    self.scale = scale
-    self.rotation = rotation
+  func orThrow(_ error: @autoclosure () -> Error) throws -> Wrapped {
+    guard let self else { throw error() }
+    return self
   }
 
-  public init() {
-    self.init(position: .zero, scale: .zero, rotation: .zero)
+  func orThrow() throws -> Wrapped {
+    try orThrow(UnwrapError())
   }
 }

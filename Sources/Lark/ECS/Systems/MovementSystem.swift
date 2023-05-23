@@ -34,7 +34,7 @@ public final class MovementSystem: System {
     }
   }
 
-  public func update(deltaTime: LarkDuration) {
+  public func update(deltaTime: __shared LarkDuration) {
     for entityID in entityIDs {
       @SystemComponentProxy(TransformComponent.self, entityID: entityID) var transform
       @SystemComponentProxy(RigidBodyComponent.self, entityID: entityID) var rigidBody

@@ -18,36 +18,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct Rect<Value: Numeric> {
-  public var origin: Point2<Value>
-  public var size: Size2<Value>
+@propertyWrapper
+@dynamicMemberLookup
+public struct Proxy<Value> {
+  private let get: () -> Value
+  private let set: (Value) -> Void
 
-  @inlinable
-  public init(origin: Point2<Value>, size: Size2<Value>) {
-    self.origin = origin
-    self.size = size
+  public var wrappedValue: Value {
+    get { get() }
+    nonmutating set { set(newValue) }
   }
 
-  @inlinable
-  public init(x: Value, y: Value, width: Value, height: Value) {
+  public init(get: @escaping () -> Value, set: @escaping (Value) -> Void) {
+    self.get = get
+    self.set = set
+  }
+
+  public init<Root: AnyObject>(
+    _ strongRoot: Root,
+    _ keyPath: ReferenceWritableKeyPath<Root, Value>
+  ) {
     self.init(
-      origin: .init(x: x, y: y),
-      size: .init(width: width, height: height)
+      get: { strongRoot[keyPath: keyPath] },
+      set: { strongRoot[keyPath: keyPath] = $0 }
     )
   }
 
-  @inlinable
-  public init() {
-    self.init(origin: .zero, size: .zero)
+  public init<Root: AnyObject>(
+    weak root: Root,
+    _ keyPath: ReferenceWritableKeyPath<Root, Value>
+  ) {
+    var fallback = root[keyPath: keyPath]
+    self.init(
+      get: { [weak root] in root?[keyPath: keyPath] ?? fallback },
+      set: { [weak root] in
+        root?[keyPath: keyPath] = $0
+        fallback = $0
+      }
+    )
   }
 
-  @inlinable
-  public static var zero: Self { .init() }
+  public subscript<NewValue>(
+    dynamicMember keyPath: WritableKeyPath<Value, NewValue>
+  ) -> Proxy<NewValue> {
+    Proxy<NewValue>(
+      get: { wrappedValue[keyPath: keyPath] },
+      set: { wrappedValue[keyPath: keyPath] = $0 }
+    )
+  }
 }
-
-extension Rect: Equatable where Value: Equatable {}
-extension Rect: Hashable where Value: Hashable {}
-extension Rect: Sendable where Value: Sendable {}
-
-public typealias IRect = Rect<Int32>
-public typealias FRect = Rect<Float>

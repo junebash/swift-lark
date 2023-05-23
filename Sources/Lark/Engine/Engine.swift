@@ -37,7 +37,6 @@ public final class Engine {
   public let configuration: Configuration
 
   @Environment(\.registry) public var registry
-
   @Environment(\.logger) private var logger
   @Environment(\.updateClock) private var updateClock
 
@@ -70,7 +69,7 @@ public final class Engine {
         let deltaTime = lastUpdate.duration(to: frameStart)
         lastUpdate = frameStart
         currentState.update(deltaTime: deltaTime)
-        registry.update(deltaTime: deltaTime)
+        try registry.update(deltaTime: deltaTime)
         // movementSystem.update()
         // collisionSystem.update()
         // damageSystem.update()
