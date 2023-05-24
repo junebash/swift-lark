@@ -27,7 +27,7 @@ public protocol Scene {
   func nextScene() -> SceneProvider?
 }
 
-public extension Scene {
-  func update(deltaTime: LarkDuration) {}
-  func nextScene() -> SceneProvider? { nil }
+extension Scene {
+  public func update(deltaTime: LarkDuration) {}
+  public func nextScene() -> SceneProvider? { nil }
 }

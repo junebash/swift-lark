@@ -24,8 +24,8 @@ private enum ResourcePathKey: EnvironmentKey {
   static let defaultValue: String? = Bundle.main.resourcePath
 }
 
-public extension EnvironmentValues {
-  var resourcePath: String? {
+extension EnvironmentValues {
+  public var resourcePath: String? {
     get { self[ResourcePathKey.self] }
     set { self[ResourcePathKey.self] = newValue }
   }

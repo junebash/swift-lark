@@ -31,7 +31,7 @@ public struct Color: Sendable {
 
   @inlinable
   internal static func _normalizeComponent(_ value: Float) -> UInt8 {
-    UInt8(value.clamped(to: 0.0 ... 1.0) * ._uint8Max)
+    UInt8(value.clamped(to: 0.0...1.0) * ._uint8Max)
   }
 
   @inlinable
@@ -58,36 +58,36 @@ extension Color: Hashable {
   }
 }
 
-public extension Color {
+extension Color {
   @inlinable
-  var red: UInt8 {
+  public var red: UInt8 {
     _read { yield sdlColor.r }
     _modify { yield &sdlColor.r }
     set { sdlColor.r = newValue }
   }
 
   @inlinable
-  var green: UInt8 {
+  public var green: UInt8 {
     _read { yield sdlColor.g }
     _modify { yield &sdlColor.g }
     set { sdlColor.g = newValue }
   }
 
   @inlinable
-  var blue: UInt8 {
+  public var blue: UInt8 {
     _read { yield sdlColor.b }
     _modify { yield &sdlColor.b }
     set { sdlColor.b = newValue }
   }
 
   @inlinable
-  var alpha: UInt8 {
+  public var alpha: UInt8 {
     _read { yield sdlColor.a }
     _modify { yield &sdlColor.a }
     set { sdlColor.a = newValue }
   }
 
-  struct Floats {
+  public struct Floats {
     @usableFromInline
     internal let _or, _og, _ob, _oa: () -> Float
 
@@ -129,7 +129,7 @@ public extension Color {
   }
 
   @inlinable
-  var floats: Floats {
+  public var floats: Floats {
     _read {
       yield makeFloats()
     }
@@ -163,12 +163,12 @@ public extension Color {
     )
   }
 
-  init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = .max) {
+  public init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = .max) {
     self.init(sdlColor: .init(r: red, g: green, b: blue, a: alpha))
   }
 
   @_disfavoredOverload
-  init(red: Float, green: Float, blue: Float, alpha: Float = 1.0) {
+  public init(red: Float, green: Float, blue: Float, alpha: Float = 1.0) {
     self.init(
       red: Color._normalizeComponent(red),
       green: Color._normalizeComponent(green),
@@ -177,18 +177,18 @@ public extension Color {
     )
   }
 
-  init(white: UInt8, alpha: UInt8 = .max) {
+  public init(white: UInt8, alpha: UInt8 = .max) {
     self.init(red: white, green: white, blue: white, alpha: alpha)
   }
 
   @_disfavoredOverload
-  init(white: Float, alpha: Float = 1.0) {
+  public init(white: Float, alpha: Float = 1.0) {
     self.init(red: white, green: white, blue: white, alpha: alpha)
   }
 }
 
 // MARK: - Statics
 
-public extension Color {
-  static let white: Color = .init(white: 1.0)
+extension Color {
+  public static let white: Color = .init(white: 1.0)
 }

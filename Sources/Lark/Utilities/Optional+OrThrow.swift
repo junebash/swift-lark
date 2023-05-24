@@ -18,15 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public extension Optional {
-  struct UnwrapError: Error {}
+extension Optional {
+  public struct UnwrapError: Error {}
 
-  func orThrow(_ error: @autoclosure () -> Error) throws -> Wrapped {
+  public func orThrow(_ error: @autoclosure () -> Error) throws -> Wrapped {
     guard let self else { throw error() }
     return self
   }
 
-  func orThrow() throws -> Wrapped {
+  public func orThrow() throws -> Wrapped {
     try orThrow(UnwrapError())
   }
 }

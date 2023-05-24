@@ -18,16 +18,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public extension FloatingPoint {
+extension FloatingPoint {
   @inlinable
-  func clamped(to range: ClosedRange<Self>) -> Self {
+  public func clamped(to range: ClosedRange<Self>) -> Self {
     var newValue = self
     newValue.clamp(to: range)
     return newValue
   }
 
   @inlinable
-  mutating func clamp(to range: ClosedRange<Self>) {
+  public mutating func clamp(to range: ClosedRange<Self>) {
     switch self {
     case range.upperBound...:
       self = range.upperBound
@@ -44,13 +44,14 @@ extension Float {
   static let _uint8Max: Float = 255.0
 
   @usableFromInline
-  static let _uint8MaxReciprocal: Float = 0.0039215686274509803921568627450980392156862745098039215686274509
+  static let _uint8MaxReciprocal: Float =
+    0.0039215686274509803921568627450980392156862745098039215686274509
 }
 
-public extension Numeric {
-  var nonZero: Self? { self == .zero ? nil : self }
+extension Numeric {
+  public var nonZero: Self? { self == .zero ? nil : self }
 }
 
-public extension SignedNumeric where Self: Comparable {
-  var positive: Self? { self > .zero ? self : nil }
+extension SignedNumeric where Self: Comparable {
+  public var positive: Self? { self > .zero ? self : nil }
 }

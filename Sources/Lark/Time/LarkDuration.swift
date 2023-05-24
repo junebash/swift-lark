@@ -32,30 +32,30 @@ public struct LarkDuration: Hashable, Sendable {
   }
 }
 
-public extension LarkDuration {
+extension LarkDuration {
   @inlinable
-  static func seconds(_ seconds: some BinaryInteger) -> Self {
+  public static func seconds(_ seconds: some BinaryInteger) -> Self {
     Self(seconds: Float(seconds))
   }
 
   @inlinable
-  static func seconds(_ seconds: some BinaryFloatingPoint) -> Self {
+  public static func seconds(_ seconds: some BinaryFloatingPoint) -> Self {
     Self(seconds: Float(seconds))
   }
 
   @inlinable
-  static func milliseconds(_ milliseconds: some BinaryInteger) -> Self {
+  public static func milliseconds(_ milliseconds: some BinaryInteger) -> Self {
     Self(seconds: Float(milliseconds) * 0.001)
   }
 
   @inlinable
-  static func milliseconds(_ milliseconds: some BinaryFloatingPoint) -> Self {
+  public static func milliseconds(_ milliseconds: some BinaryFloatingPoint) -> Self {
     Self(seconds: Float(milliseconds) * 0.001)
   }
 
-  static let fps120: Self = .init(seconds: 1 / 120)
-  static let fps60: Self = .init(seconds: 1 / 60)
-  static let fps30: Self = .init(seconds: 1 / 30)
+  public static let fps120: Self = .init(seconds: 1 / 120)
+  public static let fps60: Self = .init(seconds: 1 / 60)
+  public static let fps30: Self = .init(seconds: 1 / 30)
 }
 
 extension LarkDuration: Comparable {

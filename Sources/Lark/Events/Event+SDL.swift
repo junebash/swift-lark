@@ -25,7 +25,7 @@ extension Event {
   init?(event: SDL_Event) {
     guard let kind = Event.Kind(event: event) else { return nil }
     self = .init(kind: kind, timestamp: EnvironmentValues.current.updateClock.now)
-//        self = .init(kind: kind, timestamp: EnvironmentValues.current.updateClock.now)
+    //        self = .init(kind: kind, timestamp: EnvironmentValues.current.updateClock.now)
   }
 }
 

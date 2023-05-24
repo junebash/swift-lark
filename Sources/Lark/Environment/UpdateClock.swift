@@ -21,8 +21,8 @@
 import Clocks
 import SDL2
 
-public extension EnvironmentValues {
-  var updateClock: LarkClock {
+extension EnvironmentValues {
+  public var updateClock: LarkClock {
     get { self[UpdateClockKey.self] }
     set { self[UpdateClockKey.self] = newValue }
   }

@@ -65,12 +65,12 @@ extension Vector2: AdditiveArithmetic {
   }
 }
 
-public extension Vector2 {
-  static func * (vec: Vector2, value: Value) -> Vector2 {
+extension Vector2 {
+  public static func * (vec: Vector2, value: Value) -> Vector2 {
     Vector2(x: vec.x * value, y: vec.y * value)
   }
 
-  static func *= (vec: inout Vector2, value: Value) {
+  public static func *= (vec: inout Vector2, value: Value) {
     vec.x *= value
     vec.y *= value
   }

@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public extension Task where Failure == Error {
-  var cancellableValue: Success {
+extension Task where Failure == Error {
+  public var cancellableValue: Success {
     get async throws {
       try await withTaskCancellationHandler {
         try await self.value
@@ -30,8 +30,8 @@ public extension Task where Failure == Error {
   }
 }
 
-public extension Task where Failure == Never {
-  var cancellableValue: Success {
+extension Task where Failure == Never {
+  public var cancellableValue: Success {
     get async {
       await withTaskCancellationHandler {
         await self.value

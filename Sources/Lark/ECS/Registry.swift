@@ -50,7 +50,7 @@ public final class Registry: Sendable {
 
   public func removeComponent<C: Component>(_: C.Type, for entityID: EntityID) {
     entityComponentSignatures[entityID]?.removeComponent(C.self)
-//    pool(for: C.self).removeComponent(for: entity)
+    //    pool(for: C.self).removeComponent(for: entity)
   }
 
   public func entity<C: Component>(_ entity: EntityID, hasComponent: C.Type) -> Bool {

@@ -78,8 +78,8 @@ public final class Window {
   }
 }
 
-public extension Window {
-  enum Position {
+extension Window {
+  public enum Position {
     case centered
     case undefined
 
@@ -91,7 +91,7 @@ public extension Window {
     }
   }
 
-  struct Options: OptionSet {
+  public struct Options: OptionSet {
     public var rawValue: UInt32
 
     public init(rawValue: UInt32) {
@@ -99,7 +99,8 @@ public extension Window {
     }
 
     public static let fullscreen: Self = .init(rawValue: SDL_WINDOW_FULLSCREEN.rawValue)
-    public static let fullscreenDesktop: Self = .init(rawValue: SDL_WINDOW_FULLSCREEN_DESKTOP.rawValue)
+    public static let fullscreenDesktop: Self = .init(
+      rawValue: SDL_WINDOW_FULLSCREEN_DESKTOP.rawValue)
     public static let openGL: Self = .init(rawValue: SDL_WINDOW_OPENGL.rawValue)
     public static let metal: Self = .init(rawValue: SDL_WINDOW_METAL.rawValue)
     public static let vulkan: Self = .init(rawValue: SDL_WINDOW_VULKAN.rawValue)

@@ -33,8 +33,8 @@ public struct Events: Sendable {
   }
 }
 
-public extension EnvironmentValues {
-  var events: Events {
+extension EnvironmentValues {
+  public var events: Events {
     get { self[EventsKey.self] }
     set { self[EventsKey.self] = newValue }
   }

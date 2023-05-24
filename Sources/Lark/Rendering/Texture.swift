@@ -24,7 +24,7 @@ public final class Texture {
   public struct Metadata {
     public var size: ISize2
     public var formatKind: PixelFormat.Kind
-    public var accessRawValue: Int32 // TODO: Add actual 'access' type
+    public var accessRawValue: Int32  // TODO: Add actual 'access' type
   }
 
   let sdlPointer: OpaquePointer

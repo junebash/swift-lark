@@ -11,7 +11,7 @@ let package = Package(
       targets: ["Lark"]
     ),
     .executable(name: "LarkExample", targets: ["LarkExample"]),
-    .library(name: "SDL2Image", targets: ["SDL2Image"])
+    .library(name: "SDL2Image", targets: ["SDL2Image"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-async-algorithms", from: Version(0, 0, 3)),
@@ -25,7 +25,7 @@ let package = Package(
       url: "https://github.com/pointfreeco/swift-identified-collections.git",
       .upToNextMajor(from: Version(0, 7, 1))
     ),
-    .package(url: "https://github.com/junebash/swift-gen", branch: "protocol")
+    .package(url: "https://github.com/junebash/swift-gen", branch: "protocol"),
   ],
   targets: [
     .target(
@@ -41,7 +41,7 @@ let package = Package(
         .product(name: "Lock", package: "swift-lock"),
         .product(name: "Collections", package: "swift-collections"),
         .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-        .product(name: "Gen", package: "swift-gen")
+        .product(name: "Gen", package: "swift-gen"),
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warn-concurrency"])]
     ),
@@ -63,7 +63,7 @@ let package = Package(
       pkgConfig: "sdl2",
       providers: [
         .brew(["sdl2"]),
-        .apt(["libsdl2-dev"])
+        .apt(["libsdl2-dev"]),
       ]
     ),
 
@@ -71,7 +71,7 @@ let package = Package(
       name: "SDL2Image",
       dependencies: [
         "CSDL2Image",
-        "SDL2"
+        "SDL2",
       ]
     ),
     .systemLibrary(
@@ -80,7 +80,7 @@ let package = Package(
       pkgConfig: "SDL2_image",
       providers: [
         .brew(["SDL2_image"]),
-        .apt(["libsdl2-image-dev"])
+        .apt(["libsdl2-image-dev"]),
       ]
     ),
 
@@ -88,6 +88,6 @@ let package = Package(
       name: "LarkTests",
       dependencies: ["Lark"],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warn-concurrency"])]
-    )
+    ),
   ]
 )

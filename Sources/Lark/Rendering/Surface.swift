@@ -33,8 +33,8 @@ public final class Surface {
   }
 }
 
-public extension Surface {
-  convenience init(path: String) throws {
+extension Surface {
+  public convenience init(path: String) throws {
     let pointer = try withThrowingSDL {
       path.withCString {
         IMG_Load($0)

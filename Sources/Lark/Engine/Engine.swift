@@ -73,7 +73,7 @@ public final class Engine {
         lastUpdate = frameStart
         try currentState.activeScene?.update(deltaTime: deltaTime)
         if let nextScene = currentState.activeScene?.nextScene() {
-          currentState.activeScene = nil // nil out previous scene first to free resources
+          currentState.activeScene = nil  // nil out previous scene first to free resources
           currentState.activeScene = try nextScene()
         }
         try registry.update(deltaTime: deltaTime)

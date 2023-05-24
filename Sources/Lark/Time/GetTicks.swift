@@ -58,13 +58,13 @@ private enum GetTicks64: EnvironmentKey {
   static let defaultValue: Ticks = .sdl64()
 }
 
-public extension EnvironmentValues {
-  var getTicks32: Ticks {
+extension EnvironmentValues {
+  public var getTicks32: Ticks {
     get { self[GetTicks32.self] }
     set { self[GetTicks32.self] = newValue }
   }
 
-  var getTicks64: Ticks {
+  public var getTicks64: Ticks {
     get { self[GetTicks64.self] }
     set { self[GetTicks64.self] = newValue }
   }

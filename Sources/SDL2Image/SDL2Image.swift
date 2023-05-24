@@ -28,10 +28,10 @@ import SDL2
 //    | IMG_INIT_WEBP.rawValue
 // )
 
-public extension SDL_Surface {
+extension SDL_Surface {
   /// https://sdl.beuc.net/sdl.wiki/Pixel_Access
   @inlinable
-  func getPixel(x: Int, y: Int) -> UInt32 {
+  public func getPixel(x: Int, y: Int) -> UInt32 {
     let bpp = format.pointee.BytesPerPixel
     let p = pixels.advanced(by: y * Int(pitch) + x * Int(bpp))
 
@@ -60,7 +60,7 @@ public extension SDL_Surface {
   }
 
   @inlinable
-  func getPixelRGBA(x: Int, y: Int) -> (UInt8, UInt8, UInt8, UInt8) {
+  public func getPixelRGBA(x: Int, y: Int) -> (UInt8, UInt8, UInt8, UInt8) {
     let pixel = getPixel(x: x, y: y)
     var r: UInt8 = 0
     var g: UInt8 = 0
@@ -71,7 +71,7 @@ public extension SDL_Surface {
   }
 
   @inlinable
-  func getPixelRGB(x: Int, y: Int) -> (UInt8, UInt8, UInt8) {
+  public func getPixelRGB(x: Int, y: Int) -> (UInt8, UInt8, UInt8) {
     let pixel = getPixel(x: x, y: y)
     var r: UInt8 = 0
     var g: UInt8 = 0
@@ -80,7 +80,7 @@ public extension SDL_Surface {
     return (r, g, b)
   }
 
-  @inlinable var pixelBuffer: UnsafeMutableRawBufferPointer {
+  @inlinable public var pixelBuffer: UnsafeMutableRawBufferPointer {
     let count = Int(Int32(pitch) * h * Int32(format.pointee.BytesPerPixel))
     return UnsafeMutableRawBufferPointer(
       start: pixels,

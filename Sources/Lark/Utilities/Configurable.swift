@@ -22,14 +22,14 @@ public typealias Configure<Value> = (inout Value) -> Void
 
 public protocol Configurable {}
 
-public extension Configurable {
-  __consuming func with(_ configuration: Configure<Self>) -> Self {
+extension Configurable {
+  public __consuming func with(_ configuration: Configure<Self>) -> Self {
     configure(self, with: configuration)
   }
 }
 
-public extension Configurable where Self: EmptyInitializable {
-  init(configure: Configure<Self>) {
+extension Configurable where Self: EmptyInitializable {
+  public init(configure: Configure<Self>) {
     self.init()
     configure(&self)
   }

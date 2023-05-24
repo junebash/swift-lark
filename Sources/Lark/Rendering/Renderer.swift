@@ -36,9 +36,9 @@ public final class Renderer {
   }
 }
 
-public extension Renderer {
+extension Renderer {
   @inlinable
-  func setColor(_ color: Color) {
+  public func setColor(_ color: Color) {
     SDL_SetRenderDrawColor(
       _sdlRendererPointer,
       color.red,
@@ -49,18 +49,18 @@ public extension Renderer {
   }
 
   @inlinable
-  func clear() throws {
+  public func clear() throws {
     try withThrowingSDL {
       SDL_RenderClear(_sdlRendererPointer)
     }
   }
 
   @inlinable
-  func present() {
+  public func present() {
     SDL_RenderPresent(_sdlRendererPointer)
   }
 
-  func fillRect(_ rect: IRect) throws {
+  public func fillRect(_ rect: IRect) throws {
     try withThrowingSDL {
       withUnsafePointer(to: rect) { ptr in
         ptr.withMemoryRebound(to: SDL_Rect.self, capacity: 1) { sdlPtr in
@@ -70,7 +70,7 @@ public extension Renderer {
     }
   }
 
-  func fillRect(_ rect: FRect) throws {
+  public func fillRect(_ rect: FRect) throws {
     try withThrowingSDL {
       withUnsafePointer(to: rect) { ptr in
         ptr.withMemoryRebound(to: SDL_FRect.self, capacity: 1) { sdlPtr in
@@ -80,7 +80,7 @@ public extension Renderer {
     }
   }
 
-  func renderCopy(_ texture: Texture, source: IRect? = nil, destination: IRect?) throws {
+  public func renderCopy(_ texture: Texture, source: IRect? = nil, destination: IRect?) throws {
     try withThrowingSDL {
       withUnsafeOptionalSDLPointer(to: source, reboundTo: SDL_Rect.self) { srcPtr in
         withUnsafeOptionalSDLPointer(to: destination, reboundTo: SDL_Rect.self) { dstPtr in
@@ -90,7 +90,7 @@ public extension Renderer {
     }
   }
 
-  func renderCopy(
+  public func renderCopy(
     _ texture: Texture,
     source: __shared IRect? = nil,
     destination: __shared FRect?
@@ -104,7 +104,7 @@ public extension Renderer {
     }
   }
 
-  func renderCopy(
+  public func renderCopy(
     _ texture: Texture,
     source: __shared IRect? = nil,
     destination: __shared FRect?,
@@ -152,8 +152,8 @@ public struct AxisSet: OptionSet {
 
 // MARK: - Options
 
-public extension Renderer {
-  struct Options: OptionSet, Sendable {
+extension Renderer {
+  public struct Options: OptionSet, Sendable {
     public var rawValue: UInt32
 
     public init(rawValue: UInt32) {

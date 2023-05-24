@@ -278,7 +278,7 @@ public struct ControllerEventInfo: Sendable, Hashable {
     case touchpadDown(TouchpadEventInfo)
     case touchpadMotion(TouchpadEventInfo)
     case touchpadUp(TouchpadEventInfo)
-    case sensorUpdated // TODO: ??
+    case sensorUpdated  // TODO: ??
   }
 
   public let id: UInt32

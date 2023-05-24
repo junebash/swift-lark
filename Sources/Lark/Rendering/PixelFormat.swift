@@ -81,8 +81,8 @@ public final class PixelFormat {
 
 // MARK: - Kind
 
-public extension PixelFormat {
-  enum Kind {
+extension PixelFormat {
+  public enum Kind {
     case unknown
     case index1lsb
     case index1msb

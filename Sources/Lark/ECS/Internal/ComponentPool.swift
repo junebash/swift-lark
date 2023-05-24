@@ -27,19 +27,25 @@ internal final class ComponentPool<C: Component> {
 
   subscript(entityID entityID: EntityID) -> C {
     _read {
-      yield values[entityID, default: {
-        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
-      }()]
+      yield values[
+        entityID,
+        default: {
+          preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+        }()]
     }
     _modify {
-      yield &values[entityID, default: {
-        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
-      }()]
+      yield &values[
+        entityID,
+        default: {
+          preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+        }()]
     }
     set {
-      values[entityID, default: {
-        preconditionFailure("Expected component \(C.self) for entity \(entityID)")
-      }()] = newValue
+      values[
+        entityID,
+        default: {
+          preconditionFailure("Expected component \(C.self) for entity \(entityID)")
+        }()] = newValue
     }
   }
 

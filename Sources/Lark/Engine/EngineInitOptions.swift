@@ -35,5 +35,7 @@ public struct EngineInitOptions: OptionSet {
   public static let gameController: Self = .init(rawValue: SDL_INIT_GAMECONTROLLER)
   public static let events: Self = .init(rawValue: SDL_INIT_EVENTS)
   public static let sensor: Self = .init(rawValue: SDL_INIT_SENSOR)
-  public static let everything: Self = [.timer, .audio, .haptic, .gameController, .events, .sensor, .video]
+  public static let everything: Self = [
+    .timer, .audio, .haptic, .gameController, .events, .sensor, .video,
+  ]
 }

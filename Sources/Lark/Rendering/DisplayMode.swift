@@ -36,7 +36,7 @@ public struct DisplayMode {
       SDL_GetCurrentDisplayMode(displayIndex, &displayMode)
     }
     return .init(
-      format: .unknown, // TODO: -
+      format: .unknown,  // TODO: -
       size: ISize2(width: displayMode.w, height: displayMode.h),
       refreshRate: displayMode.refresh_rate.nonZero,
       driverData: DriverData(pointer: displayMode.driverdata)

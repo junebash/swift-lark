@@ -18,8 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@testable import Lark
 import XCTest
+
+@testable import Lark
 
 final class ColorTests: XCTestCase {
   func test_normalizeComponent() {

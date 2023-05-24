@@ -62,12 +62,12 @@ extension Angle: AdditiveArithmetic {
   }
 }
 
-public extension Angle {
-  static func * (angle: Angle, multiplier: Double) -> Angle {
+extension Angle {
+  public static func * (angle: Angle, multiplier: Double) -> Angle {
     .radians(angle.radians * multiplier)
   }
 
-  static func * (angle: Angle, multiplier: some BinaryInteger) -> Angle {
+  public static func * (angle: Angle, multiplier: some BinaryInteger) -> Angle {
     .radians(angle.radians * Double(multiplier))
   }
 }

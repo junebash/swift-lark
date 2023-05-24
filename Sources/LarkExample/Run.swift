@@ -44,9 +44,9 @@ final class ExampleGame: GameProtocol {
   @Environment(\.logger) private var logger
   @Environment(\.events) private var events
 
-//  let registry: Registry
-//  let assetStore: AssetStore
-//
+  //  let registry: Registry
+  //  let assetStore: AssetStore
+  //
   var activeScene: (any Scene)?
 
   init(registry: Registry, assetStore: AssetStore) throws {

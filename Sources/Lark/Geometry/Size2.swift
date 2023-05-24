@@ -37,26 +37,26 @@ public struct Size2<Span: Numeric> {
   public static var zero: Self { .init() }
 }
 
-public extension Size2 where Span: BinaryFloatingPoint {
+extension Size2 where Span: BinaryFloatingPoint {
   @inlinable
-  init<OtherSpan: BinaryInteger>(_ other: Size2<OtherSpan>) {
+  public init<OtherSpan: BinaryInteger>(_ other: Size2<OtherSpan>) {
     self.init(width: Span(other.width), height: Span(other.height))
   }
 
   @inlinable
-  init<OtherSpan: BinaryFloatingPoint>(_ other: Size2<OtherSpan>) {
+  public init<OtherSpan: BinaryFloatingPoint>(_ other: Size2<OtherSpan>) {
     self.init(width: Span(other.width), height: Span(other.height))
   }
 }
 
-public extension Size2 where Span: BinaryInteger {
+extension Size2 where Span: BinaryInteger {
   @inlinable
-  init<OtherSpan: BinaryInteger>(_ other: Size2<OtherSpan>) {
+  public init<OtherSpan: BinaryInteger>(_ other: Size2<OtherSpan>) {
     self.init(width: Span(other.width), height: Span(other.height))
   }
 
   @inlinable
-  init<OtherSpan: BinaryFloatingPoint>(_ other: Size2<OtherSpan>) {
+  public init<OtherSpan: BinaryFloatingPoint>(_ other: Size2<OtherSpan>) {
     self.init(width: Span(other.width), height: Span(other.height))
   }
 }
@@ -65,8 +65,8 @@ extension Size2: Equatable where Span: Equatable {}
 extension Size2: Hashable where Span: Hashable {}
 extension Size2: Sendable where Span: Sendable {}
 
-public extension Size2 {
-  static func * (size: Size2, scale: Vector2<Span>) -> Size2 {
+extension Size2 {
+  public static func * (size: Size2, scale: Vector2<Span>) -> Size2 {
     Size2(
       width: size.width * scale.x,
       height: size.height * scale.y
