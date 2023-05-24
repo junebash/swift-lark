@@ -24,7 +24,6 @@ public final class Registry: Sendable {
   private var systems: SystemsManager = .init()
   private var entityLifetime: EntityLifetimeManager = .init()
   private var entityComponentSignatures: [EntityID: ComponentSignature] = [:]
-  private let assetStore: AssetStore = .init()
 
   @Environment(\.logger) var logger
 
@@ -68,7 +67,7 @@ public final class Registry: Sendable {
 
   public func update(deltaTime: LarkDuration) throws {
     updateEntities()
-    try systems.update(deltaTime: deltaTime)
+    try systems.update(registry: self, deltaTime: deltaTime)
   }
 
   // MARK: - Internal Methods
@@ -110,18 +109,5 @@ public final class Registry: Sendable {
   private func addEntityToSystems(_ entityID: EntityID) {
     guard let signature = entityComponentSignatures[entityID] else { return }
     systems.addEntity(entityID, toSystemsWithSignature: signature)
-  }
-}
-
-// MARK: - Environment
-
-extension Registry: EnvironmentKey {
-  public nonisolated static let defaultValue: Registry = .init()
-}
-
-public extension EnvironmentValues {
-  var registry: Registry {
-    get { self[Registry.self] }
-    set { self[Registry.self] = newValue }
   }
 }

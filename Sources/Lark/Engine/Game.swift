@@ -22,5 +22,5 @@
 public protocol GameProtocol {
   var isRunning: Bool { get }
 
-  mutating func update(deltaTime: LarkDuration)
+  var activeScene: (any Scene)? { get set }
 }

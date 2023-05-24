@@ -24,7 +24,6 @@ public final class MovementSystem: System {
 
   public var entityIDs: EntityIDStore = .init()
 
-  @Environment(\.registry) private var registry
   @Environment(\.logger) private var logger
 
   public init() {
@@ -34,10 +33,13 @@ public final class MovementSystem: System {
     }
   }
 
-  public func update(deltaTime: __shared LarkDuration) {
+  public func update(registry: __shared Registry, deltaTime: __shared LarkDuration) {
     for entityID in entityIDs {
-      @SystemComponentProxy(TransformComponent.self, entityID: entityID) var transform
-      @SystemComponentProxy(RigidBodyComponent.self, entityID: entityID) var rigidBody
+      @SystemComponentProxy(registry: registry, entityID: entityID)
+      var transform: TransformComponent
+
+      @SystemComponentProxy(registry: registry, entityID: entityID)
+      var rigidBody: RigidBodyComponent
 
       transform.position += rigidBody.velocity
       logger.trace("Position for \(entityID) is now \(transform.position)")

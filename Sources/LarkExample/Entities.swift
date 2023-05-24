@@ -18,45 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import IdentifiedCollections
-import OrderedCollections
+import Lark
 
-@MainActor
-public protocol System: AnyObject {
-  var componentSignature: ComponentSignature { get }
-  var entityIDs: EntityIDStore { get set }
+final class TankEntity: Entity {
+  let id: EntityID
+  let registry: Registry
 
-  func update(registry: __shared Registry, deltaTime: __shared LarkDuration) throws
-}
+  @ComponentProxy var transform: TransformComponent = .init(
+    position: .init(10, 10),
+    scale: .unit * 3,
+    rotation: .degrees(45)
+  )
+  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
+  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: Asset.tankSprite.id)
 
-extension System {
-  @inlinable
-  internal static var typeID: ObjectIdentifier { ObjectIdentifier(Self.self) }
-
-  @inlinable
-  public func canOperate(on otherSignature: ComponentSignature) -> Bool {
-    componentSignature.isSubset(of: otherSignature)
+  init(id: EntityID, registry: Registry) {
+    self.id = id
+    self.registry = registry
   }
 }
 
-public struct EntityIDStore {
-  public private(set) var values: OrderedSet<EntityID> = []
+final class TruckEntity: Entity {
+  let id: EntityID
+  let registry: Registry
 
-  public init() {}
+  @ComponentProxy var transform: TransformComponent = .init(position: .init(10, 10))
+  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(0, 0.5))
+  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: Asset.truckSprite.id)
 
-  public mutating func add(_ entity: EntityID) {
-    values.append(entity)
-  }
-
-  public mutating func remove(_ entity: EntityID) {
-    values.remove(entity)
-  }
-}
-
-extension EntityIDStore: Sequence {
-  public typealias Iterator = OrderedSet<EntityID>.Iterator
-
-  public func makeIterator() -> OrderedSet<EntityID>.Iterator {
-    values.makeIterator()
+  init(id: EntityID, registry: Registry) {
+    self.id = id
+    self.registry = registry
   }
 }

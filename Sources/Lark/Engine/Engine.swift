@@ -26,19 +26,22 @@ import SDL2
 
 @MainActor
 public final class Engine {
-  public struct Configuration: Equatable {
+  public struct Configuration {
     public var initOptions: EngineInitOptions = .everything
     public var logFrameTiming: Bool = false
     public var targetFrameDuration: LarkDuration = .fps60
+    public var updateClock: LarkClock = .live
 
     public init() {}
   }
 
   public let configuration: Configuration
 
-  @Environment(\.registry) public var registry
+  public let registry: Registry = .init()
+
   @Environment(\.logger) private var logger
-  @Environment(\.updateClock) private var updateClock
+
+  private var updateClock: LarkClock { configuration.updateClock }
 
   public init(configuration: Configuration = .init()) throws {
     self.configuration = configuration
@@ -68,7 +71,11 @@ public final class Engine {
         let frameStart = updateClock.now
         let deltaTime = lastUpdate.duration(to: frameStart)
         lastUpdate = frameStart
-        currentState.update(deltaTime: deltaTime)
+        try currentState.activeScene?.update(deltaTime: deltaTime)
+        if let nextScene = currentState.activeScene?.nextScene() {
+          currentState.activeScene = nil // nil out previous scene first to free resources
+          currentState.activeScene = try nextScene()
+        }
         try registry.update(deltaTime: deltaTime)
         // movementSystem.update()
         // collisionSystem.update()
@@ -78,7 +85,6 @@ public final class Engine {
         //        if leftoverTime > .zero {
         //          updateClock.sleep(for: leftoverTime)
         //        }
-        SDL_Delay(1000 / 240)
       }
     } catch {
       logger.critical("Error in game loop: \(error)")

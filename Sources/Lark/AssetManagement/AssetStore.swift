@@ -24,7 +24,7 @@ public final class AssetStore {
     case noResourcePath
   }
 
-  private var textures: [AssetID<Texture>: Texture] = [:]
+  private var textures: [Asset<Texture>.ID: Texture] = [:]
 
   @Environment(\.resourcePath) private var resourcePath
 
@@ -34,25 +34,24 @@ public final class AssetStore {
     textures.removeAll(keepingCapacity: keepingCapacity)
   }
 
-  public func addTexture(_ texture: Texture, for id: AssetID<Texture>) {
+  public func addTexture(_ texture: Texture, for id: Asset<Texture>.ID) {
     textures[id] = texture
   }
 
   @discardableResult
   public func addTexture(
-    at path: String,
-    for id: AssetID<Texture>,
+    for asset: Asset<Texture>,
     with renderer: Renderer
   ) throws -> Texture {
     let texture = try Texture(
       renderer: renderer,
-      surface: Surface(path: resolvedPath(for: path))
+      surface: Surface(path: resolvedPath(for: asset.path))
     )
-    textures[id] = texture
+    textures[asset.id] = texture
     return texture
   }
 
-  public func texture(for id: AssetID<Texture>) -> Texture? {
+  public func texture(for id: Asset<Texture>.ID) -> Texture? {
     textures[id]
   }
 
@@ -66,16 +65,5 @@ public final class AssetStore {
     default:
       return resourcePath + "/" + path
     }
-  }
-}
-
-extension AssetStore: EnvironmentKey {
-  public static let defaultValue: AssetStore = .init()
-}
-
-public extension EnvironmentValues {
-  var assetStore: AssetStore {
-    get { self[AssetStore.self] }
-    set { self[AssetStore.self] = newValue }
   }
 }

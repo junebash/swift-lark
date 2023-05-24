@@ -34,13 +34,16 @@ public final class RenderingSystem: System {
     self.assetStore = assetStore
   }
 
-  public func update(deltaTime: __shared LarkDuration) throws {
+  public func update(registry: __shared Registry, deltaTime: __shared LarkDuration) throws {
     renderer.setColor(Color(red: 0, green: 0.1, blue: 0.1))
     try renderer.clear()
 
     for entityID in entityIDs {
-      @SystemComponentProxy(entityID: entityID) var transform: TransformComponent
-      @SystemComponentProxy(entityID: entityID) var sprite: SpriteComponent
+      @SystemComponentProxy(registry: registry, entityID: entityID)
+      var transform: TransformComponent
+
+      @SystemComponentProxy(registry: registry, entityID: entityID)
+      var sprite: SpriteComponent
 
       let texture = try assetStore.texture(for: sprite.textureAssetID).orThrow()
 

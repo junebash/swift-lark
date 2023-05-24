@@ -18,20 +18,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct AssetID<AssetType>: Hashable, RawRepresentable {
-  public var rawValue: String
+public struct Asset<AssetType>: Identifiable {
+  public struct ID: Hashable, RawRepresentable, ExpressibleByStringLiteral {
+    public var rawValue: String
 
-  public init(rawValue: String) {
-    self.init(rawValue)
+    public init(rawValue: String) {
+      self.init(rawValue)
+    }
+
+    public init(_ rawValue: String) {
+      self.rawValue = rawValue
+    }
+
+    public init(stringLiteral: String) {
+      self.init(stringLiteral)
+    }
   }
 
-  public init(_ rawValue: String) {
-    self.rawValue = rawValue
-  }
-}
+  public var id: ID
+  public var path: String
 
-extension AssetID: ExpressibleByStringLiteral {
-  public init(stringLiteral: String) {
-    self.init(stringLiteral)
+  public init(id: ID, path: String) {
+    self.id = id
+    self.path = path
   }
 }

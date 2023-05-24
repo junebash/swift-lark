@@ -80,9 +80,9 @@ internal final class SystemsManager {
     }
   }
 
-  func update(deltaTime: __shared LarkDuration) throws {
+  func update(registry: __shared Registry, deltaTime: __shared LarkDuration) throws {
     for key in systems.keys {
-      try systems[key]!.update(deltaTime: deltaTime)
+      try systems[key]!.update(registry: registry, deltaTime: deltaTime)
     }
   }
 }

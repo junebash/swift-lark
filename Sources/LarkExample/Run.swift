@@ -23,40 +23,13 @@ import Lark
 import Logging
 import SDL2
 
-extension AssetID where AssetType == Texture {
-  static var tankSprite: AssetID { "tankSprite" }
-  static var truckSprite: AssetID { "truckSprite" }
-}
-
-final class TankEntity: Entity {
-  let id: EntityID
-  let registry: Registry
-
-  @ComponentProxy var transform: TransformComponent = .init(
-    position: .init(10, 10),
-    scale: .unit * 3,
-    rotation: .degrees(45)
-  )
-  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(1, 0))
-  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: .tankSprite)
-
-  init(id: EntityID, registry: Registry) {
-    self.id = id
-    self.registry = registry
+extension Asset where AssetType == Texture {
+  static var tankSprite: Asset {
+    Asset(id: "tankSprite", path: "/assets/images/tank-tiger-right.png")
   }
-}
 
-final class TruckEntity: Entity {
-  let id: EntityID
-  let registry: Registry
-
-  @ComponentProxy var transform: TransformComponent = .init(position: .init(10, 10))
-  @ComponentProxy var rigidBody: RigidBodyComponent = .init(velocity: .init(0, 0.5))
-  @ComponentProxy var sprite: SpriteComponent = .init(textureAssetID: .truckSprite)
-
-  init(id: EntityID, registry: Registry) {
-    self.id = id
-    self.registry = registry
+  static var truckSprite: Asset {
+    Asset(id: "truckSprite", path: "/assets/images/truck-ford-down.png")
   }
 }
 
@@ -71,13 +44,12 @@ final class ExampleGame: GameProtocol {
   @Environment(\.logger) private var logger
   @Environment(\.events) private var events
 
-  let tank: TankEntity
-  let truck: TruckEntity
+//  let registry: Registry
+//  let assetStore: AssetStore
+//
+  var activeScene: (any Scene)?
 
-  init() throws {
-    @Environment(\.registry) var registry
-    @Environment(\.assetStore) var assetStore
-
+  init(registry: Registry, assetStore: AssetStore) throws {
     self.windowSize = ISize2(width: 800, height: 600)
     self.window = try Window(
       title: "Hi There!",
@@ -92,38 +64,12 @@ final class ExampleGame: GameProtocol {
     registry.addSystem(MovementSystem())
     registry.addSystem(RenderingSystem(renderer: renderer, assetStore: assetStore))
 
-    try assetStore.addTexture(
-      at: "/assets/images/tank-tiger-right.png",
-      for: .tankSprite,
-      with: renderer
+    self.activeScene = try TestScene(
+      assetStore: assetStore,
+      renderer: renderer,
+      registry: registry,
+      isRunning: Proxy(weak: self, \.isRunning)
     )
-    try assetStore.addTexture(
-      at: "/assets/images/truck-ford-down.png",
-      for: .truckSprite,
-      with: renderer
-    )
-    self.tank = try registry.createEntity(TankEntity.self)
-    self.truck = try registry.createEntity(TruckEntity.self)
-  }
-
-  func update(deltaTime: LarkDuration) {
-    for event in events() {
-      switch event.kind {
-      case .quit:
-        isRunning = false
-      case let .keyUp(info) where info.keyCode == .escape:
-        isRunning = false
-      case let .window(_, windowEvent):
-        switch windowEvent {
-        case let .resized(newSize):
-          windowSize = newSize
-        default:
-          break
-        }
-      default:
-        break
-      }
-    }
   }
 }
 
@@ -136,7 +82,8 @@ enum Run {
       $0.resourcePath = Bundle.module.resourcePath
     } perform: {
       let engine = try Engine()
-      try engine.run(ExampleGame())
+      let assetStore = AssetStore()
+      try engine.run(ExampleGame(registry: engine.registry, assetStore: assetStore))
     }
   }
 }

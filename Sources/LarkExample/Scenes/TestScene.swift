@@ -18,45 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import IdentifiedCollections
-import OrderedCollections
+import Lark
 
-@MainActor
-public protocol System: AnyObject {
-  var componentSignature: ComponentSignature { get }
-  var entityIDs: EntityIDStore { get set }
+struct TestScene: Scene {
+  let tank: TankEntity
+  let truck: TruckEntity
 
-  func update(registry: __shared Registry, deltaTime: __shared LarkDuration) throws
-}
+  @Proxy var isRunning: Bool
 
-extension System {
-  @inlinable
-  internal static var typeID: ObjectIdentifier { ObjectIdentifier(Self.self) }
+  @Environment(\.events) private var events
 
-  @inlinable
-  public func canOperate(on otherSignature: ComponentSignature) -> Bool {
-    componentSignature.isSubset(of: otherSignature)
-  }
-}
-
-public struct EntityIDStore {
-  public private(set) var values: OrderedSet<EntityID> = []
-
-  public init() {}
-
-  public mutating func add(_ entity: EntityID) {
-    values.append(entity)
+  init(
+    assetStore: AssetStore,
+    renderer: Renderer,
+    registry: Registry,
+    isRunning: Proxy<Bool>
+  ) throws {
+    self._isRunning = isRunning
+    try assetStore.addTexture(for: .tankSprite, with: renderer)
+    try assetStore.addTexture(for: .truckSprite, with: renderer)
+    self.tank = try registry.createEntity(TankEntity.self)
+    self.truck = try registry.createEntity(TruckEntity.self)
   }
 
-  public mutating func remove(_ entity: EntityID) {
-    values.remove(entity)
-  }
-}
-
-extension EntityIDStore: Sequence {
-  public typealias Iterator = OrderedSet<EntityID>.Iterator
-
-  public func makeIterator() -> OrderedSet<EntityID>.Iterator {
-    values.makeIterator()
+  func update(deltaTime: LarkDuration) throws {
+    for event in events() {
+      switch event.kind {
+      case .quit:
+        isRunning = false
+      case let .keyUp(info) where info.keyCode == .escape:
+        isRunning = false
+      default:
+        break
+      }
+    }
   }
 }

@@ -22,9 +22,8 @@
 @MainActor
 internal struct SystemComponentProxy<C: Component> {
   private var fallback: C?
+  private let registry: Registry
   private let entityID: EntityID
-
-  @Environment(\.registry) private var registry
 
   var wrappedValue: C {
     mutating get {
@@ -44,7 +43,8 @@ internal struct SystemComponentProxy<C: Component> {
     }
   }
 
-  init(_: C.Type = C.self, entityID: EntityID) {
+  init(_: C.Type = C.self, registry: Registry, entityID: EntityID) {
+    self.registry = registry
     self.entityID = entityID
   }
 }

@@ -18,45 +18,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import IdentifiedCollections
-import OrderedCollections
-
 @MainActor
-public protocol System: AnyObject {
-  var componentSignature: ComponentSignature { get }
-  var entityIDs: EntityIDStore { get set }
+public protocol Scene {
+  typealias SceneProvider = () throws -> any Scene
 
-  func update(registry: __shared Registry, deltaTime: __shared LarkDuration) throws
+  mutating func update(deltaTime: LarkDuration) throws
+
+  func nextScene() -> SceneProvider?
 }
 
-extension System {
-  @inlinable
-  internal static var typeID: ObjectIdentifier { ObjectIdentifier(Self.self) }
-
-  @inlinable
-  public func canOperate(on otherSignature: ComponentSignature) -> Bool {
-    componentSignature.isSubset(of: otherSignature)
-  }
-}
-
-public struct EntityIDStore {
-  public private(set) var values: OrderedSet<EntityID> = []
-
-  public init() {}
-
-  public mutating func add(_ entity: EntityID) {
-    values.append(entity)
-  }
-
-  public mutating func remove(_ entity: EntityID) {
-    values.remove(entity)
-  }
-}
-
-extension EntityIDStore: Sequence {
-  public typealias Iterator = OrderedSet<EntityID>.Iterator
-
-  public func makeIterator() -> OrderedSet<EntityID>.Iterator {
-    values.makeIterator()
-  }
+public extension Scene {
+  func update(deltaTime: LarkDuration) {}
+  func nextScene() -> SceneProvider? { nil }
 }

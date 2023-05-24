@@ -19,13 +19,13 @@
 // SOFTWARE.
 
 public struct SpriteComponent: Component {
-  public var textureAssetID: AssetID<Texture>
+  public var textureAssetID: Asset<Texture>.ID
   public var source: IRect?
   public var rotationCenter: FVector2? = nil
   public var flip: AxisSet
 
   public init(
-    textureAssetID: AssetID<Texture>,
+    textureAssetID: Asset<Texture>.ID,
     source: IRect? = nil,
     rotationCenter: FVector2? = nil,
     flip: AxisSet = .none
