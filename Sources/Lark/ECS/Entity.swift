@@ -32,6 +32,7 @@ extension EntityID: CustomStringConvertible {
 
 @MainActor
 public protocol Entity: AnyObject, Identifiable where ID == EntityID {
+  var id: EntityID { get }
   var registry: Registry { get }
 
   init(id: ID, registry: Registry)

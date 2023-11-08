@@ -20,9 +20,10 @@
 
 import Lark
 
-struct TestScene: Scene {
+final class TestScene: Scene {
   let tank: TankEntity
   let truck: TruckEntity
+  let assetStore: AssetStore
 
   @Proxy var isRunning: Bool
 
@@ -34,11 +35,22 @@ struct TestScene: Scene {
     registry: Registry,
     isRunning: Proxy<Bool>
   ) throws {
+    self.assetStore = assetStore
+
     self._isRunning = isRunning
     try assetStore.addTexture(for: .tankSprite, with: renderer)
     try assetStore.addTexture(for: .truckSprite, with: renderer)
+
+
     self.tank = try registry.createEntity(TankEntity.self)
     self.truck = try registry.createEntity(TruckEntity.self)
+  }
+
+  deinit {
+    // TODO: - isolated deinit
+    Task { @MainActor [assetStore] in
+      assetStore.clear(keepingCapacity: true)
+    }
   }
 
   func update(deltaTime: LarkDuration) throws {

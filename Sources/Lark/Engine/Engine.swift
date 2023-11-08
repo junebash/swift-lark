@@ -44,6 +44,8 @@ public final class Engine {
   private var updateClock: LarkClock { configuration.updateClock }
 
   public init(configuration: Configuration = .init()) throws {
+    @Environment(\.logger) var logger
+
     self.configuration = configuration
 
     do {
